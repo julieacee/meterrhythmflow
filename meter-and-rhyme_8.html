@@ -1,0 +1,1670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Meter & Rhyme — a writing studio</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=Space+Grotesk:wght@400;500;600&family=Work+Sans:wght@400;500;600;700&family=Quicksand:wght@400;500;600;700&family=Nunito:wght@400;600;700&family=Caveat:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Sans:wght@400;500;600&display=swap');
+
+  :root{
+    --scale:1;
+    --panel-scale:1;
+    --font-display:'Cormorant Garamond';
+    --font-ui:'Space Grotesk';
+    --purple:#5b3fa6;
+    --purple-soft:#5b3fa64a;
+    --blue:#2f5fcf;
+    --teal:#0e9c8f;
+    --teal-bright:#3fd0c2;
+    --pink:#d6417f;
+    --pink-bright:#f3a9c8;
+    --navy:#1f2b52;
+    --navy-2:#28356a;
+    --text:#181c30;
+    --muted:#565f82;
+    --card-bg:#fffefc;
+    --card-border:#e7e1f1;
+    --hero-color:#1f2b52;
+  }
+  body.theme-pink{ --page-color:#f7dbea; }
+  body.theme-green{ --page-color:#dcf0e2; }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:linear-gradient(165deg, var(--page-color) 0%, #ffffff 62%);
+    color:var(--text);
+    font-family:var(--font-display), serif;
+    font-style:normal;
+    min-height:100vh;
+  }
+  @media (prefers-reduced-motion: reduce){ *{animation-duration:0.001ms !important; transition-duration:0.001ms !important;} }
+
+  /* ---------- hero ---------- */
+  .hero{ background:linear-gradient(120deg, var(--hero-color) 0%, color-mix(in srgb, var(--hero-color) 65%, black) 100%); padding:30px 20px; }
+  .hero-inner{ max-width:1220px; margin:0 auto; display:flex; flex-direction:column; align-items:center; gap:16px; text-align:center; }
+  .hero-title-block{ width:100%; max-width:820px; }
+  .eyebrow{ font-family:var(--font-ui), sans-serif; font-size:11px; letter-spacing:0.22em; text-transform:uppercase; color:var(--pink-bright); margin-bottom:10px; }
+  h1{
+    display:flex; justify-content:space-between; align-items:baseline; width:100%;
+    font-family:'Nunito', sans-serif;
+    font-size:clamp(22px, 4vw, 34px);
+    font-weight:800;
+    font-style:normal;
+    margin:0 0 14px;
+    letter-spacing:0.01em;
+    color:#faf7f2;
+  }
+  h1 span{ white-space:nowrap; }
+  .sub{ font-family:'Nunito', sans-serif; color:#d9d4ea; font-size:16px; font-style:normal; max-width:56ch; line-height:1.55; margin:0 auto; }
+  .tagline{ font-family:'Nunito', sans-serif; color:var(--teal-bright); font-size:14px; font-weight:700; letter-spacing:0.02em; margin:10px auto 0; }
+  .toolbar{ display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:18px; }
+
+  h2.section-title{ font-family:var(--font-ui), sans-serif; font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:var(--navy); margin:0; }
+  h2.top-section-title{ font-family:var(--font-ui), sans-serif; font-size:12px; letter-spacing:0.18em; text-transform:uppercase; color:var(--navy); margin:0 0 14px 2px; }
+
+  /* ---------- toolbar / mode toggle ---------- */
+  .tool-group{ display:flex; align-items:center; gap:9px; }
+  .tool-label{ font-family:var(--font-ui), sans-serif; font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:#a9a3c6; }
+  .size-btn{ width:28px; height:28px; border-radius:50%; border:1.3px solid #6b6f9c; background:transparent; color:#f0edf7; font-family:var(--font-ui), sans-serif; font-size:15px; line-height:1; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+  .size-btn:hover{ background:#f0edf7; color:var(--navy); border-color:#f0edf7; }
+  .size-readout{ font-family:var(--font-ui), sans-serif; font-size:12px; color:#c7c2dc; min-width:34px; text-align:center; }
+  .swatch-btn{ width:24px; height:24px; border-radius:50%; cursor:pointer; border:2px solid transparent; padding:0; }
+  .swatch-btn.pink{ background:#f2b8d4; }
+  .swatch-btn.green{ background:#a9dcb8; }
+  .swatch-btn.active{ border-color:#f0edf7; }
+  .hex-color-input{ width:26px; height:26px; padding:0; border:1.4px solid #6b6f9c; border-radius:50%; cursor:pointer; background:none; }
+  .pill-btn{ border:1.3px solid #6b6f9c; background:transparent; color:#f0edf7; font-family:var(--font-ui), sans-serif; font-size:11.5px; letter-spacing:0.03em; padding:6px 14px; border-radius:20px; cursor:pointer; }
+  .pill-btn:hover{ background:#f0edf7; color:var(--navy); border-color:#f0edf7; }
+
+  .mode-toggle{ display:flex; border:1.3px solid #6b6f9c; border-radius:20px; padding:2px; }
+  .mode-btn{ border:none; background:transparent; color:#c7c2dc; font-family:var(--font-ui), sans-serif; font-size:12px; letter-spacing:0.04em; padding:6px 16px; border-radius:18px; cursor:pointer; }
+  .mode-btn.active{ background:#f0edf7; color:var(--navy); }
+
+  .drafts-wrap{ position:relative; }
+  .drafts-panel{ display:none; position:absolute; top:calc(100% + 10px); right:0; width:280px; max-height:340px; overflow-y:auto; background:var(--card-bg); border:1px solid var(--card-border); border-radius:8px; box-shadow: 0 20px 40px -18px rgba(31,43,82,0.55); z-index:20; padding:8px; }
+  .drafts-panel.open{ display:block; }
+  .drafts-empty{ padding:18px 10px; color:var(--muted); font-size:13.5px; text-align:center; }
+  .draft-item{ display:flex; align-items:center; justify-content:space-between; gap:8px; padding:9px 10px; border-radius:5px; cursor:pointer; }
+  .draft-item:hover{ background:#f4f1fb; }
+  .draft-info{ min-width:0; }
+  .draft-title{ font-size:15px; color:var(--text); line-height:1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .draft-date{ font-family:var(--font-ui), sans-serif; font-size:10px; color:var(--muted); margin-top:2px; }
+  .draft-del{ flex:0 0 auto; width:22px; height:22px; border-radius:50%; border:1px solid var(--card-border); background:transparent; color:var(--pink); font-size:13px; line-height:1; cursor:pointer; }
+  .draft-del:hover{ background:var(--pink); color:#fff; border-color:var(--pink); }
+  .save-status{ font-family:var(--font-ui), sans-serif; font-size:10.5px; color:#a9a3c6; margin-left:2px; }
+  .draft-name-input{
+    border:1.3px solid #6b6f9c; background:transparent; color:#f0edf7;
+    font-family:var(--font-ui), sans-serif; font-size:12px; padding:6px 12px;
+    border-radius:16px; outline:none; width:150px;
+  }
+  .draft-name-input::placeholder{ color:#a9a3c6; }
+  .draft-name-input:focus{ border-color:#f0edf7; }
+
+  /* ---------- main content ---------- */
+  main.wrap{ max-width:1220px; margin:0 auto; padding:32px 20px 56px; }
+
+  .layout{ display:grid; grid-template-columns: 1fr 1fr; gap:26px; align-items:start; }
+  body[data-mode="story"] .layout{ grid-template-columns: 5fr 7fr; }
+  body[data-mode="scraps"] #mainLayout{ display:none !important; }
+  body[data-mode="scraps"] #finderColumn{ display:none !important; }
+  body[data-mode="scraps"] .layout-secondary{ grid-template-columns: 1fr; max-width:640px; margin:0 auto; }
+  body[data-mode="scraps"] .scrap-compose textarea{ min-height:120px; font-size:19px; }
+  body:not([data-mode="scraps"]) #draftsToolGroup{ display:flex; }
+  body[data-mode="scraps"] #draftsToolGroup{ display:none; }
+  .layout-secondary{ display:grid; grid-template-columns: 1fr 1fr; gap:26px; align-items:start; }
+  .col-left, .col-right{ min-width:0; }
+  .col-right{ position:sticky; top:16px; }
+  .tools-section{ margin-top:38px; }
+
+  @media (max-width: 900px){
+    .layout, .layout-secondary{ grid-template-columns: 1fr; }
+    .col-right{ position:static; }
+  }
+
+  .card{ background:var(--card-bg); border:1px solid var(--card-border); border-radius:6px; box-shadow: 0 16px 36px -24px rgba(31,43,82,0.45); }
+
+  .page{ border-top:4px solid var(--purple); padding:24px 26px; }
+  textarea{ width:100%; min-height:150px; resize:none; overflow:hidden; border:none; outline:none; background:transparent; color:var(--text); font-family:var(--font-display), serif; font-size:calc(21px * var(--scale)); font-style:normal; line-height:1.6; caret-color:var(--pink); }
+  textarea::placeholder{ color:var(--muted); font-style:normal; }
+
+  .stats{ display:flex; flex-wrap:wrap; gap:22px; margin:16px 2px 0; padding:14px 4px 0; border-top:1px solid var(--card-border); font-family:var(--font-ui), sans-serif; }
+  .stat .num{ font-family:var(--font-display), serif; font-size:25px; font-style:normal; color:var(--purple); line-height:1; }
+  .stat .label{ font-size:10px; letter-spacing:0.13em; text-transform:uppercase; color:var(--navy); margin-top:4px; }
+  .scheme-string{ letter-spacing:0.14em; }
+
+  .footnote{ margin:16px 2px 0; font-style:normal; color:var(--muted); font-size:13.5px; line-height:1.6; max-width:62ch; }
+  .footnote em{ font-style:italic; color:var(--blue); }
+
+  .panel{ border-top:4px solid var(--navy); padding:6px 20px; display:flex; flex-direction:column; }
+  .panel.poem-panel{ overflow-y:auto; }
+  .panel.story-panel{ max-height:74vh; overflow-y:auto; }
+  .panel-head{ display:flex; justify-content:space-between; align-items:center; padding:14px 2px 10px; border-bottom:1px solid var(--card-border); }
+  .panel-title{ font-family:var(--font-ui), sans-serif; font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:var(--navy); }
+  .empty{ padding:34px 10px; text-align:center; color:var(--muted); font-style:normal; font-size:15px; }
+
+  .rows{ position:relative; flex:1; }
+  .thread-svg{ position:absolute; top:0; right:0; width:60px; height:100%; pointer-events:none; overflow:visible; }
+  .thread-path{ fill:none; stroke-width:1.6; }
+  .thread-path.true{ stroke:var(--teal); }
+  .thread-path.slant{ stroke:var(--pink); stroke-dasharray:2 3; }
+  .thread-path.echo{ stroke:var(--navy); stroke-dasharray:1 3; opacity:0.5;}
+  .row{ display:grid; grid-template-columns: 22px calc(38px * var(--panel-scale)) 1fr calc(30px * var(--panel-scale)) 52px; align-items:center; gap:10px; padding:calc(8px * var(--panel-scale)) 0; border-bottom:1px solid var(--card-border); }
+  .row:last-child{ border-bottom:none; }
+  .lineno{ font-family:var(--font-ui), sans-serif; font-size:10px; color:var(--navy); letter-spacing:0.03em; }
+  .syll{ width:calc(30px * var(--panel-scale)); height:calc(30px * var(--panel-scale)); border-radius:50%; border:1.4px solid var(--purple-soft); display:flex; align-items:center; justify-content:center; font-family:var(--font-ui), sans-serif; font-size:max(10px, calc(12px * var(--panel-scale))); font-style:normal; color:var(--purple); background:radial-gradient(circle at 35% 30%, #5b3fa614, transparent 70%); }
+  .syll.flag{ font-style:italic; border-color:var(--blue); color:var(--blue); background:radial-gradient(circle at 35% 30%, #2f5fcf14, transparent 70%); }
+  .linetext{ font-size:max(12px, calc(18px * var(--panel-scale))); font-style:normal; line-height:1.25; color:var(--text); overflow-wrap:anywhere; }
+  .linetext em, .story-prose em{ font-style:italic; }
+  .linetext strong, .story-prose strong{ font-weight:700; }
+  .linetext u, .story-prose u{ text-decoration:underline; }
+  .format-bar{ display:flex; gap:6px; margin-bottom:12px; }
+  .fmt-btn{ width:30px; height:30px; border:1.3px solid var(--card-border); background:#fbfaff; border-radius:4px; cursor:pointer; font-family:var(--font-display), serif; font-size:15px; color:var(--text); }
+  .fmt-btn:hover{ background:var(--navy); color:#fff; border-color:var(--navy); }
+  .font-picker{ border:1.3px solid #6b6f9c; background:transparent; color:#f0edf7; font-family:var(--font-ui), sans-serif; font-size:11.5px; padding:5px 10px; border-radius:14px; cursor:pointer; }
+  .font-picker option{ color:#111; }
+  .rhyme-note{ display:block; font-family:var(--font-ui), sans-serif; font-size:max(8.5px, calc(10px * var(--panel-scale))); font-style:normal; letter-spacing:0.05em; text-transform:uppercase; margin-top:1px; }
+  .rhyme-note.true{ color:var(--teal); } .rhyme-note.slant{ color:var(--pink); } .rhyme-note.echo{ color:var(--navy); } .rhyme-note.flag{ color:var(--blue); font-style:italic; }
+  .stamp{ width:calc(26px * var(--panel-scale)); height:calc(26px * var(--panel-scale)); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:max(10px, calc(14px * var(--panel-scale))); font-style:normal; border:1.4px solid var(--card-border); color:var(--navy); justify-self:center; }
+  .stamp.true{ border-color:var(--teal); color:var(--teal); } .stamp.slant{ border-color:var(--pink); color:var(--pink); } .stamp.flag{ border-color:var(--blue); color:var(--blue); font-style:italic; }
+
+  .legend{ display:flex; flex-wrap:wrap; gap:16px; padding:10px 2px 12px; border-top:1px solid var(--card-border); font-family:var(--font-ui), sans-serif; font-size:10.5px; color:var(--muted); }
+  .legend span{ display:inline-flex; align-items:center; gap:6px; }
+  .swatch{ width:14px; height:2px; display:inline-block; }
+  .swatch.true{ background:var(--teal); } .swatch.slant{ background:var(--pink); background-image:linear-gradient(90deg, var(--pink) 60%, transparent 40%); background-size:6px 2px;} .swatch.flag{ background:var(--blue); }
+  .swatch-box{ width:12px; height:12px; border-radius:3px; display:inline-block; }
+  .swatch-box.repeat{ background:#2f5fcf33; border:1px solid var(--blue); }
+  .swatch-box.adverb{ background:#d6417f22; border:1px solid var(--pink); }
+  .swatch-box.passive{ background:#0e9c8f22; border:1px solid var(--teal); }
+
+  /* ---------- story prose view ---------- */
+  .rhythm-chart{ display:flex; align-items:flex-end; gap:3px; height:54px; padding:14px 2px 10px; overflow-x:auto; border-bottom:1px solid var(--card-border); }
+  .rhythm-bar{ flex:0 0 auto; width:6px; border-radius:2px 2px 0 0; min-height:3px; }
+  .rhythm-bar.short{ background:var(--teal); } .rhythm-bar.medium{ background:var(--purple); } .rhythm-bar.long{ background:var(--pink); }
+  .scene-nav{ display:flex; flex-wrap:wrap; gap:8px; padding:10px 2px; border-bottom:1px solid var(--card-border); }
+  .scene-nav-item{ font-family:var(--font-ui), sans-serif; font-size:11px; padding:4px 11px; border:1px solid var(--card-border); border-radius:12px; cursor:pointer; color:var(--navy); background:none; }
+  .scene-nav-item:hover{ background:var(--navy); color:#fff; }
+  .scene-divider{ margin:16px 0; padding:5px 0; border-top:1px dashed var(--card-border); color:var(--navy); font-family:var(--font-ui), sans-serif; font-size:10.5px; letter-spacing:0.12em; text-transform:uppercase; text-align:center; }
+  .story-prose{ font-size:calc(17px * var(--scale)); line-height:1.7; padding:8px 2px 4px; }
+  .story-prose p{ margin:0 0 14px; }
+  .hl.repeat{ background:#2f5fcf22; border-bottom:1.5px solid var(--blue); }
+  .hl.adverb{ background:#d6417f1c; border-bottom:1.5px solid var(--pink); }
+  .hl.passive{ background:#0e9c8f1c; border-bottom:1.5px solid var(--teal); }
+
+  /* ---------- finder ---------- */
+  .finder{ border-top:4px solid var(--teal); padding:22px 26px 24px; }
+  .finder-row{ display:flex; gap:10px; margin-top:14px; }
+  .finder-input{ flex:1; border:1.4px solid var(--card-border); border-radius:5px; padding:10px 14px; font-family:var(--font-display), serif; font-size:19px; color:var(--text); outline:none; background:#fbfaff; }
+  .finder-input:focus{ border-color:var(--teal); }
+  .finder-btn{ border:none; background:var(--teal); color:#fff; font-family:var(--font-ui), sans-serif; font-size:12.5px; letter-spacing:0.04em; padding:0 20px; border-radius:5px; cursor:pointer; }
+  .finder-btn:hover{ background:#0c8377; }
+  .chip-group{ margin-top:18px; }
+  .chip-group-label{ font-family:var(--font-ui), sans-serif; font-size:10.5px; letter-spacing:0.12em; text-transform:uppercase; color:var(--navy); margin-bottom:8px; }
+  .chip-row{ display:flex; flex-wrap:wrap; gap:8px; }
+  .chip{ font-family:var(--font-ui), sans-serif; font-size:13px; padding:6px 12px; border-radius:16px; cursor:pointer; border:1.3px solid transparent; background:none; }
+  .chip.true{ background:#e7f7f4; color:var(--teal); border-color:#c3ece5; } .chip.true:hover{ background:var(--teal); color:#fff; }
+  .chip.near{ background:#fbeaf1; color:var(--pink); border-color:#f4cfe0; } .chip.near:hover{ background:var(--pink); color:#fff; }
+  .finder-status{ margin-top:14px; color:var(--muted); font-size:13.5px; }
+  .finder-hint{ margin-top:14px; color:var(--muted); font-size:12.5px; line-height:1.5; }
+  .finder-save-status{ margin-top:6px; font-family:var(--font-ui), sans-serif; font-size:12px; min-height:14px; }
+
+  /* ---------- scraps (tagged, dated entries) ---------- */
+  .scraps{ border-top:4px solid var(--pink); padding:22px 26px 20px; display:flex; flex-direction:column; }
+  .scrap-compose textarea{ width:100%; min-height:70px; resize:none; border:1.4px solid var(--card-border); border-radius:5px; padding:10px 12px; font-family:var(--font-display), serif; font-size:17px; color:var(--text); outline:none; background:#fbfaff; margin-top:12px; }
+  .scrap-compose textarea:focus{ border-color:var(--pink); }
+  .scrap-compose-row{ display:flex; align-items:center; gap:8px; margin-top:8px; }
+  .scrap-tag-input{ flex:1; border:1.4px solid var(--card-border); border-radius:14px; padding:6px 12px; font-family:var(--font-ui), sans-serif; font-size:12.5px; color:var(--text); outline:none; background:#fbfaff; min-width:0; }
+  .scrap-tag-input:focus{ border-color:var(--pink); }
+  .scrap-color-input{ width:30px; height:30px; padding:0; border:1.4px solid var(--card-border); border-radius:50%; cursor:pointer; background:none; flex:0 0 auto; }
+  .scrap-add-btn{ border:none; background:var(--pink); color:#fff; font-family:var(--font-ui), sans-serif; font-size:12.5px; letter-spacing:0.03em; padding:0 16px; height:30px; border-radius:16px; cursor:pointer; flex:0 0 auto; }
+  .scrap-add-btn:hover{ background:#b83069; }
+  .scraps-hint{ margin-top:10px; color:var(--muted); font-size:12.5px; }
+  .scraps-list{ margin-top:14px; max-height:340px; overflow-y:auto; display:flex; flex-direction:column; gap:10px; }
+  .scrap-tag-filters{ display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+  .tag-filter-chip{ font-family:var(--font-ui), sans-serif; font-size:10.5px; padding:3px 11px; border-radius:10px; cursor:pointer; border:1.3px solid var(--card-border); background:#fff; color:var(--muted); }
+  .tag-filter-chip.active{ color:#fff; border-color:transparent; }
+  .scraps-list-empty{ padding:20px 4px; color:var(--muted); font-size:13.5px; text-align:center; }
+  .scrap-item{ border:1px solid var(--card-border); border-radius:6px; padding:10px 12px; position:relative; }
+  .scrap-meta{ display:flex; align-items:center; gap:8px; margin-bottom:5px; }
+  .scrap-tag{ font-family:var(--font-ui), sans-serif; font-size:10.5px; letter-spacing:0.03em; padding:2px 9px; border-radius:10px; border:1px solid; }
+  .scrap-date{ font-family:var(--font-ui), sans-serif; font-size:10px; color:var(--muted); }
+  .scrap-mode-tag{ font-family:var(--font-ui), sans-serif; font-size:9.5px; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); }
+  .scrap-text{ font-family:var(--font-display), serif; font-size:16px; color:var(--text); line-height:1.4; overflow-wrap:anywhere; }
+  .scrap-del{ position:absolute; top:8px; right:8px; width:20px; height:20px; border-radius:50%; border:1px solid var(--card-border); background:#fff; color:var(--pink); font-size:12px; line-height:1; cursor:pointer; }
+  .scrap-del:hover{ background:var(--pink); color:#fff; border-color:var(--pink); }
+
+  /* ---------- wild card ---------- */
+  .wildcard{ border-top:4px solid var(--purple); padding:24px 28px; }
+  .wildcard-intro{ color:var(--muted); font-size:14px; margin:0 0 16px; }
+  .wildcard-options{ display:flex; flex-wrap:wrap; gap:18px; }
+  .wildcard-check{ display:flex; align-items:center; gap:7px; font-family:var(--font-ui), sans-serif; font-size:13px; color:var(--text); cursor:pointer; }
+  .wildcard-check input{ accent-color:var(--purple); width:15px; height:15px; cursor:pointer; }
+  .wildcard-result{ margin-top:20px; padding:18px 22px; background:#f7f5fc; border:1.4px dashed var(--card-border); border-radius:6px; }
+  .wc-line{ margin-bottom:12px; font-family:var(--font-display), serif; font-size:17px; color:var(--text); line-height:1.4; }
+  .wc-line:last-of-type{ margin-bottom:0; }
+  .wc-label{ font-family:var(--font-ui), sans-serif; font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:var(--navy); display:block; margin-bottom:3px; }
+  .wc-def{ display:block; font-family:var(--font-ui), sans-serif; font-size:12.5px; font-style:normal; color:var(--muted); margin-top:4px; line-height:1.45; }
+  .wc-format{ display:block; font-family:var(--font-ui), sans-serif; font-size:12.5px; font-style:normal; color:var(--text); margin-top:7px; line-height:1.45; }
+  .wc-format strong{ color:var(--purple); }
+  .wc-example{ display:block; font-family:var(--font-ui), sans-serif; font-size:12.5px; font-style:normal; color:var(--text); margin-top:7px; line-height:1.45; }
+  .wc-example strong{ color:var(--teal); }
+  .wc-actions{ display:flex; flex-wrap:wrap; gap:10px; margin-top:16px; }
+  .wc-empty{ color:var(--muted); font-size:14px; }
+  .artwork-box{ margin-top:6px; }
+  .artwork-img{ max-width:100%; max-height:340px; display:block; border-radius:6px; box-shadow:0 14px 30px -18px rgba(31,43,82,0.5); }
+  .artwork-caption{ font-family:var(--font-ui), sans-serif; font-size:12.5px; color:var(--text); margin-top:8px; line-height:1.5; }
+  .artwork-caption strong{ color:var(--navy); }
+  .artwork-source{ color:var(--muted); font-size:11px; }
+</style>
+</head>
+<body class="theme-pink" data-mode="poem">
+
+<header class="hero">
+  <div class="hero-inner">
+    <div class="hero-title-block">
+      <div class="eyebrow">A writing studio</div>
+      <h1><span>Meter.</span><span>Rhyme.</span><span>Rhythm.</span><span>Flow.</span></h1>
+      <p class="sub" id="heroSub">Creativity is seeing what others see and thinking what no one else ever thought.</p>
+      <p class="tagline">What will you create today?</p>
+    </div>
+    <div class="toolbar">
+      <div class="tool-group">
+        <span class="tool-label">Create</span>
+        <div class="mode-toggle">
+          <button class="mode-btn active" id="modePoemBtn">Poem</button>
+          <button class="mode-btn" id="modeStoryBtn">Story</button>
+          <button class="mode-btn" id="modeScrapsBtn">Scraps</button>
+        </div>
+      </div>
+      <div class="tool-group">
+        <span class="tool-label">Text size</span>
+        <button class="size-btn" id="sizeDown" aria-label="Decrease text size">–</button>
+        <span class="size-readout" id="sizeReadout">100%</span>
+        <button class="size-btn" id="sizeUp" aria-label="Increase text size">+</button>
+      </div>
+      <div class="tool-group">
+        <span class="tool-label">Font</span>
+        <select class="font-picker" id="fontPicker">
+          <option value="classic">Classic (serif + sans)</option>
+          <option value="modern">Clean / modern</option>
+          <option value="playful">Playful</option>
+          <option value="script">Script</option>
+          <option value="literary">Literary serif</option>
+        </select>
+      </div>
+      <div class="tool-group">
+        <span class="tool-label">Background</span>
+        <button class="swatch-btn pink active" id="bgPink" aria-label="Light pink background"></button>
+        <button class="swatch-btn green" id="bgGreen" aria-label="Light green background"></button>
+        <input type="color" id="bgColorInput" class="hex-color-input" value="#f7dbea" title="Custom background color" />
+      </div>
+      <div class="tool-group">
+        <span class="tool-label">Header</span>
+        <input type="color" id="heroColorInput" class="hex-color-input" value="#1f2b52" title="Header color" />
+      </div>
+      <div class="tool-group">
+        <span class="tool-label">Poem style</span>
+        <select class="font-picker" id="poemStyleSelect">
+          <option value="">None</option>
+        </select>
+      </div>
+      <div class="tool-group" id="shapeToolGroup" style="display:none;">
+        <span class="tool-label">Shape</span>
+        <select class="font-picker" id="shapeSelect"></select>
+        <button class="pill-btn" id="applyShapeBtn">Apply shape</button>
+      </div>
+      <div class="tool-group drafts-wrap">
+        <button class="pill-btn" id="lockBtn">🔒 Privacy</button>
+        <div class="drafts-panel" id="lockPanel"><div id="lockPanelContent"></div></div>
+      </div>
+      <div class="tool-group drafts-wrap" id="draftsToolGroup">
+        <input type="text" id="draftNameInput" class="draft-name-input" placeholder="Name this draft…" />
+        <button class="pill-btn" id="exportBtn">Export .txt</button>
+        <button class="pill-btn" id="saveDraftBtn">Save draft</button>
+        <button class="pill-btn" id="draftsToggle">My drafts</button>
+        <span class="save-status" id="saveStatus"></span>
+        <div class="drafts-panel" id="draftsPanel"><div id="draftsList"></div></div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="layout" id="mainLayout">
+    <div class="col-left">
+      <div class="page card">
+        <div class="format-bar">
+          <button class="fmt-btn" id="fmtBold" style="font-weight:700;" title="Bold (Ctrl+B)">B</button>
+          <button class="fmt-btn" id="fmtItalic" style="font-style:italic;" title="Italic (Ctrl+I)">I</button>
+          <button class="fmt-btn" id="fmtUnderline" style="text-decoration:underline;" title="Underline (Ctrl+U)">U</button>
+        </div>
+        <div class="wildcard-result" id="styleReference" style="display:none; margin-bottom:14px;"></div>
+        <textarea id="editor" placeholder="Begin your poem here…" spellcheck="false" rows="1"></textarea>
+        <div class="stats" id="stats" aria-live="polite">
+          <div class="stat"><div class="num" id="stat1">0</div><div class="label" id="label1">Lines</div></div>
+          <div class="stat"><div class="num" id="stat2">0</div><div class="label" id="label2">Syllables</div></div>
+          <div class="stat"><div class="num" id="stat3">–</div><div class="label" id="label3">Avg / line</div></div>
+          <div class="stat"><div class="num scheme-string" id="stat4">–</div><div class="label" id="label4">Rhyme scheme</div></div>
+        </div>
+        <p class="footnote" id="footnotePoem">Line endings are checked against actual pronunciation data, with a spelling-based estimate as backup for words the dictionary doesn't recognize. <em>Italic</em> marks a line that breaks the meter or rhyme pattern the rest of the poem has established. Your draft autosaves as you type; use "Save draft" to keep a named copy in "My drafts."</p>
+        <p class="footnote" id="footnoteStory" style="display:none;">Repeated words, adverbs, and passive voice are flagged heuristically — treat them as a nudge to look closer, not a verdict. Mark chapter or scene breaks with a line like <em>Chapter Two</em> or <em>***</em> to get a jump-to nav above your story view.</p>
+      </div>
+    </div>
+
+    <div class="col-right">
+      <div class="panel card poem-panel" id="panelPoem">
+        <div class="panel-head"><span class="panel-title">Full poem view</span><span class="save-status" id="phoneticsStatus"></span></div>
+        <div id="empty" class="empty">Your annotated lines will appear here as you write.</div>
+        <div class="rows" id="rows" style="display:none;"><svg class="thread-svg" id="threadSvg"></svg></div>
+        <div class="legend">
+          <span><i class="swatch true"></i>True rhyme</span>
+          <span><i class="swatch slant"></i>Slant rhyme</span>
+          <span><i class="swatch flag"></i>Breaks the pattern</span>
+        </div>
+      </div>
+
+      <div class="panel card story-panel" id="panelStory" style="display:none;">
+        <div class="panel-head"><span class="panel-title">Full story view</span></div>
+        <div id="storyEmpty" class="empty">Your story will appear here as you write.</div>
+        <div id="storyBody" style="display:none;">
+          <div class="scene-nav" id="sceneNav" style="display:none;"></div>
+          <div class="rhythm-chart" id="rhythmChart"></div>
+          <div class="story-prose" id="storyProse"></div>
+        </div>
+        <div class="legend">
+          <span><i class="swatch-box repeat"></i>Repeated word</span>
+          <span><i class="swatch-box adverb"></i>Adverb</span>
+          <span><i class="swatch-box passive"></i>Passive voice</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tools-section">
+    <h2 class="top-section-title">Tools</h2>
+    <div class="layout-secondary">
+      <div class="col-left" id="finderColumn">
+        <div class="finder card">
+          <h2 class="section-title" id="finderTitle">Rhyme finder</h2>
+          <div class="finder-row">
+            <input type="text" id="finderInput" class="finder-input" placeholder="Type a word…" />
+            <button class="finder-btn" id="finderBtn">Find</button>
+          </div>
+          <div id="finderResults"></div>
+          <p class="finder-hint">Click any word to save it as a tagged scrap you can find later.</p>
+          <p class="finder-save-status" id="finderSaveStatus"></p>
+        </div>
+      </div>
+      <div class="col-left">
+        <div class="scraps card">
+          <h2 class="section-title">Scraps &amp; ideas</h2>
+          <div class="scrap-compose">
+            <textarea id="scrapInput" placeholder="Jot an idea, a line, an image…" spellcheck="false"></textarea>
+            <div class="scrap-compose-row">
+              <input type="text" id="scrapTagInput" class="scrap-tag-input" placeholder="Tag (optional)" />
+              <input type="color" id="scrapColorInput" class="scrap-color-input" value="#5b3fa6" title="Tag color" />
+              <button class="scrap-add-btn" id="scrapAddBtn">Add</button>
+            </div>
+          </div>
+          <p class="scraps-hint">Every scrap you save — from any mode — shows up here, newest first.</p>
+          <input type="text" id="scrapSearch" class="scrap-tag-input" placeholder="Search scraps…" style="width:100%; margin-top:10px;" />
+          <div class="scrap-tag-filters" id="scrapTagFilters"></div>
+          <div class="scraps-list" id="scrapsList"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tools-section">
+    <h2 class="top-section-title">Wild card</h2>
+    <div class="wildcard card">
+      <p class="wildcard-intro">Stuck? Check what you want randomized, then draw. Leave the rest unchecked to skip it.</p>
+      <div class="wildcard-options">
+        <label class="wildcard-check"><input type="checkbox" id="wcCategory" checked /> Category — poem or story</label>
+        <label class="wildcard-check"><input type="checkbox" id="wcType" checked /> Type / form</label>
+        <label class="wildcard-check"><input type="checkbox" id="wcTopic" checked /> Topic</label>
+        <label class="wildcard-check"><input type="checkbox" id="wcChallenge" checked /> Challenge</label>
+      </div>
+      <button class="finder-btn" id="wcDrawBtn" style="margin-top:16px;">Draw a wild card</button>
+      <div id="wcResult" class="wildcard-result" style="display:none;"></div>
+    </div>
+  </div>
+</main>
+
+<script>
+(function(){
+  /* ================= storage: window.storage (Claude.ai) with a localStorage fallback everywhere else ================= */
+  const storageAPI = (function(){
+    if(window.storage && typeof window.storage.get === 'function'){
+      return window.storage;
+    }
+    const PREFIX = 'meter-rhyme:';
+    return {
+      async get(key){
+        try{
+          const raw = localStorage.getItem(PREFIX+key);
+          if(raw === null) return null;
+          return {key, value: raw, shared:false};
+        }catch(e){ return null; }
+      },
+      async set(key, value){
+        localStorage.setItem(PREFIX+key, value);
+        return {key, value, shared:false};
+      },
+      async delete(key){
+        localStorage.removeItem(PREFIX+key);
+        return {key, deleted:true, shared:false};
+      },
+      async list(prefix){
+        const keys = [];
+        for(let i=0;i<localStorage.length;i++){
+          const k = localStorage.key(i);
+          if(k && k.indexOf(PREFIX)===0){
+            const shortKey = k.slice(PREFIX.length);
+            if(!prefix || shortKey.indexOf(prefix)===0) keys.push(shortKey);
+          }
+        }
+        return {keys};
+      }
+    };
+  })();
+
+  const editor = document.getElementById('editor');
+  const rowsEl = document.getElementById('rows');
+  const emptyEl = document.getElementById('empty');
+  const svg = document.getElementById('threadSvg');
+  const phoneticsStatus = document.getElementById('phoneticsStatus');
+
+  const stat1=document.getElementById('stat1'), stat2=document.getElementById('stat2'), stat3=document.getElementById('stat3'), stat4=document.getElementById('stat4');
+  const label1=document.getElementById('label1'), label2=document.getElementById('label2'), label3=document.getElementById('label3'), label4=document.getElementById('label4');
+
+  const sizeDown=document.getElementById('sizeDown'), sizeUp=document.getElementById('sizeUp'), sizeReadout=document.getElementById('sizeReadout');
+  const bgPink=document.getElementById('bgPink'), bgGreen=document.getElementById('bgGreen');
+  const modePoemBtn=document.getElementById('modePoemBtn'), modeStoryBtn=document.getElementById('modeStoryBtn'), modeScrapsBtn=document.getElementById('modeScrapsBtn');
+  const draftsToolGroup=document.getElementById('draftsToolGroup'), draftNameInput=document.getElementById('draftNameInput');
+  const heroSub=document.getElementById('heroSub');
+  const panelPoem=document.getElementById('panelPoem'), panelStory=document.getElementById('panelStory');
+  const footnotePoem=document.getElementById('footnotePoem'), footnoteStory=document.getElementById('footnoteStory');
+  const finderTitle=document.getElementById('finderTitle'), finderInput=document.getElementById('finderInput');
+
+  const storyEmpty=document.getElementById('storyEmpty'), storyBody=document.getElementById('storyBody');
+  const sceneNav=document.getElementById('sceneNav'), rhythmChart=document.getElementById('rhythmChart'), storyProse=document.getElementById('storyProse');
+
+  const VOWELS = 'aeiouy';
+  let scale = 1;
+  const SCALE_MIN = 0.75, SCALE_MAX = 1.6, SCALE_STEP = 0.1;
+  let mode = 'poem'; // 'poem' | 'story'
+  let poemText = '', storyText = '';
+
+  function applyScale(){
+    document.documentElement.style.setProperty('--scale', scale.toFixed(2));
+    sizeReadout.textContent = Math.round(scale*100) + '%';
+    autoResize(editor);
+  }
+  sizeDown.addEventListener('click', ()=>{ scale = Math.max(SCALE_MIN, +(scale - SCALE_STEP).toFixed(2)); applyScale(); });
+  sizeUp.addEventListener('click', ()=>{ scale = Math.min(SCALE_MAX, +(scale + SCALE_STEP).toFixed(2)); applyScale(); });
+
+  const bgColorInput=document.getElementById('bgColorInput'), heroColorInput=document.getElementById('heroColorInput');
+  bgPink.addEventListener('click', ()=>{ document.body.classList.remove('theme-green'); document.body.classList.add('theme-pink'); document.body.style.removeProperty('--page-color'); bgPink.classList.add('active'); bgGreen.classList.remove('active'); });
+  bgGreen.addEventListener('click', ()=>{ document.body.classList.remove('theme-pink'); document.body.classList.add('theme-green'); document.body.style.removeProperty('--page-color'); bgGreen.classList.add('active'); bgPink.classList.remove('active'); });
+  bgColorInput.addEventListener('input', ()=>{
+    document.body.style.setProperty('--page-color', bgColorInput.value);
+    bgPink.classList.remove('active'); bgGreen.classList.remove('active');
+  });
+  heroColorInput.addEventListener('input', ()=>{
+    document.documentElement.style.setProperty('--hero-color', heroColorInput.value);
+  });
+
+  /* ================= FONT PRESETS ================= */
+  const FONT_PRESETS = {
+    classic:  { display:"'Cormorant Garamond'", ui:"'Space Grotesk'" },
+    modern:   { display:"'Work Sans'",          ui:"'Work Sans'" },
+    playful:  { display:"'Quicksand'",          ui:"'Nunito'" },
+    script:   { display:"'Caveat'",             ui:"'Space Grotesk'" },
+    literary: { display:"'Lora'",               ui:"'IBM Plex Sans'" }
+  };
+  const fontPicker = document.getElementById('fontPicker');
+  function applyFontPreset(key){
+    const p = FONT_PRESETS[key] || FONT_PRESETS.classic;
+    document.documentElement.style.setProperty('--font-display', p.display);
+    document.documentElement.style.setProperty('--font-ui', p.ui);
+    autoResize(editor); autoResize(scrapInput);
+  }
+  fontPicker.addEventListener('change', ()=> applyFontPreset(fontPicker.value));
+
+  /* ================= INLINE FORMATTING (bold / italic / underline) ================= */
+  function formatInline(html){
+    return html
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/__(.+?)__/g, '<u>$1</u>')
+      .replace(/\*(.+?)\*/g, '<em>$1</em>');
+  }
+  function wrapSelection(el, before, after){
+    const start = el.selectionStart, end = el.selectionEnd;
+    const value = el.value;
+    const selected = value.slice(start, end);
+    const already = selected.startsWith(before) && selected.endsWith(after) && selected.length >= before.length + after.length;
+    let newSelected, newStart, newEnd;
+    if(already){
+      newSelected = selected.slice(before.length, selected.length - after.length);
+      newStart = start; newEnd = start + newSelected.length;
+    } else {
+      newSelected = before + selected + after;
+      newStart = start + before.length; newEnd = end + before.length;
+    }
+    el.value = value.slice(0, start) + newSelected + value.slice(end);
+    el.focus(); el.setSelectionRange(newStart, newEnd);
+    el.dispatchEvent(new Event('input'));
+  }
+  document.getElementById('fmtBold').addEventListener('click', ()=> wrapSelection(editor, '**', '**'));
+  document.getElementById('fmtItalic').addEventListener('click', ()=> wrapSelection(editor, '*', '*'));
+  document.getElementById('fmtUnderline').addEventListener('click', ()=> wrapSelection(editor, '__', '__'));
+  editor.addEventListener('keydown', (e)=>{
+    if(!(e.ctrlKey || e.metaKey)) return;
+    if(e.key.toLowerCase()==='b'){ e.preventDefault(); wrapSelection(editor,'**','**'); }
+    else if(e.key.toLowerCase()==='i'){ e.preventDefault(); wrapSelection(editor,'*','*'); }
+    else if(e.key.toLowerCase()==='u'){ e.preventDefault(); wrapSelection(editor,'__','__'); }
+  });
+
+  /* ================= MODE SWITCHING ================= */
+  function switchMode(newMode){
+    if(newMode === mode) return;
+    if(mode === 'poem') poemText = editor.value; else if(mode === 'story') storyText = editor.value;
+    mode = newMode;
+    document.body.dataset.mode = mode;
+
+    modePoemBtn.classList.toggle('active', mode==='poem');
+    modeStoryBtn.classList.toggle('active', mode==='story');
+    modeScrapsBtn.classList.toggle('active', mode==='scraps');
+
+    if(mode === 'scraps'){
+      return; // CSS handles hiding #mainLayout / #finderColumn / #draftsToolGroup for this mode
+    }
+
+    editor.value = mode === 'poem' ? poemText : storyText;
+    editor.placeholder = mode === 'poem' ? 'Begin your poem here…' : 'Start your story here…';
+
+    panelPoem.style.display = mode==='poem' ? 'flex' : 'none';
+    panelStory.style.display = mode==='story' ? 'flex' : 'none';
+    footnotePoem.style.display = mode==='poem' ? 'block' : 'none';
+    footnoteStory.style.display = mode==='story' ? 'block' : 'none';
+    phoneticsStatus.style.display = mode==='poem' ? 'inline' : 'none';
+    finderTitle.textContent = mode==='poem' ? 'Rhyme finder' : 'Word finder';
+
+    if(mode==='poem'){
+      label1.textContent='Lines'; label2.textContent='Syllables'; label3.textContent='Avg / line'; label4.textContent='Rhyme scheme';
+    } else {
+      label1.textContent='Words'; label2.textContent='Sentences'; label3.textContent='Avg sentence'; label4.textContent='Paragraphs';
+    }
+
+    render();
+    autoResize(editor);
+    if(mode==='poem') schedulePhoneticsRefresh();
+  }
+  modePoemBtn.addEventListener('click', ()=>switchMode('poem'));
+  modeStoryBtn.addEventListener('click', ()=>switchMode('story'));
+  modeScrapsBtn.addEventListener('click', ()=>switchMode('scraps'));
+
+  /* ================= shared helpers ================= */
+  function autoResize(el){ el.style.height='auto'; el.style.height = el.scrollHeight + 'px'; }
+  function escapeHtml(str){ const div=document.createElement('div'); div.textContent=str; return div.innerHTML; }
+
+  /* ================= POEM ENGINE ================= */
+  function countSyllablesHeuristic(raw){
+    let word = raw.toLowerCase().replace(/[^a-z]/g,'');
+    if(!word) return 0;
+    if(word.length <= 3) return 1;
+    word = word.replace(/([^laeiouy])e$/, '$1');
+    word = word.replace(/([^td])ed$/, '$1');
+    word = word.replace(/([^sxzh])es$/, '$1');
+    word = word.replace(/^y/, '');
+    const groups = word.match(/[aeiouy]{1,2}/g);
+    return Math.max(groups ? groups.length : 1, 1);
+  }
+  function endingSounds(word){
+    if(!word) return {rime:'', nucleus:'', coda:''};
+    const w = word; let i = w.length-1;
+    while(i>=0 && !VOWELS.includes(w[i])) i--;
+    if(i<0) return {rime:w, nucleus:'', coda:w};
+    let vEnd=i; while(i>=0 && VOWELS.includes(w[i])) i--;
+    let vStart=i+1;
+    return { nucleus:w.slice(vStart,vEnd+1), coda:w.slice(vEnd+1), rime:w.slice(vStart) };
+  }
+  function classifyRhymeOrtho(sA,sB,sylA,sylB){
+    if(sA.rime && sB.rime && sA.rime===sB.rime){ return sylA===sylB ? {type:'true'} : {type:'slant', reason:'syllables'}; }
+    if(sA.nucleus && sA.nucleus===sB.nucleus) return {type:'slant', reason:'vowel'};
+    if(sA.coda && sA.coda===sB.coda) return {type:'slant', reason:'consonant'};
+    if(sA.coda && sB.coda && sA.coda.slice(-1)===sB.coda.slice(-1) && sA.coda.slice(-1)!=='') return {type:'slant', reason:'consonant'};
+    if(sA.rime && sB.rime && sA.rime.length>=2 && sB.rime.length>=2 && (sA.rime.endsWith(sB.rime)||sB.rime.endsWith(sA.rime))) return {type:'slant', reason:'partial'};
+    return null;
+  }
+  const phoneticsCache = {};
+  async function fetchPhonetics(word){
+    if(word in phoneticsCache) return phoneticsCache[word];
+    try{
+      const res = await fetch('https://api.datamuse.com/words?sp=' + encodeURIComponent(word) + '&md=rs&max=1');
+      const data = await res.json();
+      let result = null;
+      if(data && data[0] && data[0].word && data[0].word.toLowerCase()===word){
+        const tags = data[0].tags || [];
+        const pronTag = tags.find(t=>t.indexOf('pron:')===0);
+        const sylTag = tags.find(t=>t.indexOf('syllables:')===0);
+        const phones = pronTag ? pronTag.slice(5).split(' ').filter(Boolean) : null;
+        const syllables = sylTag ? parseInt(sylTag.slice(10),10) : null;
+        result = phones ? {phones, syllables} : null;
+      }
+      phoneticsCache[word]=result; return result;
+    }catch(e){ phoneticsCache[word]=null; return null; }
+  }
+  function rimeFromPhones(phones){
+    let lastVowelIdx=-1, primaryIdx=-1;
+    for(let i=0;i<phones.length;i++){ if(/\d$/.test(phones[i])) lastVowelIdx=i; if(/1$/.test(phones[i])) primaryIdx=i; }
+    const startIdx = primaryIdx!==-1 ? primaryIdx : lastVowelIdx;
+    if(startIdx===-1) return [];
+    return phones.slice(startIdx).map(p=>p.replace(/\d$/,''));
+  }
+  function classifyPhonetic(rimeA, rimeB){
+    if(!rimeA.length || !rimeB.length) return null;
+    if(rimeA.join(' ')===rimeB.join(' ')) return {type:'true'};
+    const shorter = rimeA.length<=rimeB.length ? rimeA : rimeB;
+    const longer = rimeA.length<=rimeB.length ? rimeB : rimeA;
+    if(longer.slice(longer.length-shorter.length).join(' ')===shorter.join(' ')) return {type:'slant', reason:'syllables'};
+    if(rimeA[0]===rimeB[0]) return {type:'slant', reason:'vowel'};
+    if(rimeA[rimeA.length-1]===rimeB[rimeB.length-1]) return {type:'slant', reason:'consonant'};
+    return null;
+  }
+  function getRhymeProfile(word){
+    const cached = phoneticsCache[word];
+    if(cached && cached.phones && cached.phones.length){
+      const rime = rimeFromPhones(cached.phones);
+      if(rime.length) return {mode:'phonetic', rime, syl: cached.syllables || null};
+    }
+    return {mode:'ortho', sounds: endingSounds(word), syl:null};
+  }
+  function classifyPair(wordA, wordB){
+    if(!wordA || !wordB) return null;
+    if(wordA===wordB) return {type:'identical'};
+    const pa=getRhymeProfile(wordA), pb=getRhymeProfile(wordB);
+    if(pa.mode==='phonetic' && pb.mode==='phonetic') return classifyPhonetic(pa.rime, pb.rime);
+    const sA=pa.sounds||endingSounds(wordA), sB=pb.sounds||endingSounds(wordB);
+    const sylA = pa.syl!=null ? pa.syl : countSyllablesHeuristic(wordA);
+    const sylB = pb.syl!=null ? pb.syl : countSyllablesHeuristic(wordB);
+    return classifyRhymeOrtho(sA,sB,sylA,sylB);
+  }
+  function syllablesForWord(word){ const c=phoneticsCache[word]; if(c && c.syllables) return c.syllables; return countSyllablesHeuristic(word); }
+  function countSyllablesLine(line){
+    const tokens = line.trim().split(/\s+/).filter(Boolean);
+    let total = 0;
+    tokens.forEach(tok=>{ tok.split(/[-–—]/).filter(Boolean).forEach(p=>{ const clean=p.toLowerCase().replace(/[^a-z]/g,''); if(clean) total+=syllablesForWord(clean); }); });
+    return total;
+  }
+  function lastWordOf(line){
+    const cleaned = line.trim().replace(/[""'']+$/,'');
+    const tokens = cleaned.split(/\s+/).filter(Boolean);
+    if(tokens.length===0) return '';
+    let w = tokens[tokens.length-1];
+    return w.replace(/^[^a-zA-Z]+/,'').replace(/[^a-zA-Z]+$/,'').toLowerCase();
+  }
+  const SLANT_LABEL = { syllables:'Slant rhyme — uneven syllables', vowel:'Slant rhyme — shared vowel only', consonant:'Slant rhyme — shared ending consonant', partial:'Slant rhyme — partial echo' };
+
+  function analyzePoem(lines){
+    const groups=[]; let nextCode=65; const results=[];
+    lines.forEach((line, idx)=>{
+      const word = lastWordOf(line);
+      if(!word){ results.push({idx, letter:null, type:null, reason:null, word:'', matchIdx:null}); return; }
+      let found=null;
+      for(const g of groups){
+        for(let m=g.members.length-1; m>=0; m--){
+          const member=g.members[m];
+          const c = classifyPair(word, member.word);
+          if(c){ found={group:g, member, classification: c.type==='identical'?{type:'echo'}:c}; break; }
+        }
+        if(found) break;
+      }
+      if(found){
+        found.group.members.push({idx, word});
+        results.push({idx, letter:found.group.letter, type:found.classification.type, reason:found.classification.reason||null, word, matchIdx:found.member.idx, groupRef:found.group});
+      } else {
+        const letter=String.fromCharCode(nextCode++);
+        const newGroup={letter, members:[{idx, word}]}; groups.push(newGroup);
+        results.push({idx, letter, type:null, reason:null, word, matchIdx:null, groupRef:newGroup});
+      }
+    });
+    const groupSizes = groups.map(g=>g.members.length);
+    const rhymedGroups = groupSizes.filter(s=>s>=2).length;
+    const patternEstablished = groups.length>=2 && rhymedGroups>=1 && rhymedGroups>=groups.length*0.4;
+    results.forEach(r=>{ r.rhymeBreak = !!(patternEstablished && r.groupRef && r.groupRef.members.length===1); });
+    return results;
+  }
+
+  function renderPoem(){
+    const raw = editor.value;
+    const lines = raw.split('\n');
+    const hasContent = raw.trim().length>0;
+    const workingLines = hasContent ? lines.filter(l=>l.trim().length>0) : [];
+    if(workingLines.length===0){
+      emptyEl.style.display='block'; rowsEl.style.display='none';
+      stat1.textContent='0'; stat2.textContent='0'; stat3.textContent='–'; stat4.textContent='–';
+      return;
+    }
+    emptyEl.style.display='none'; rowsEl.style.display='block';
+    const syllCounts = workingLines.map(countSyllablesLine);
+    const rhymeInfo = analyzePoem(workingLines);
+    const freq={}; syllCounts.forEach(c=>freq[c]=(freq[c]||0)+1);
+    const distinctValues = Object.keys(freq).length;
+    let modeValue=null, modeFreq=0;
+    Object.entries(freq).forEach(([val,f])=>{ if(f>modeFreq){modeFreq=f; modeValue=Number(val);} });
+    const total = syllCounts.length;
+    const meterEstablished = total>=3 && modeFreq>=2 && modeFreq<total && distinctValues<=total*0.7;
+
+    Array.from(rowsEl.querySelectorAll('.row')).forEach(el=>el.remove());
+    workingLines.forEach((line, idx)=>{
+      const row = document.createElement('div'); row.className='row'; row.dataset.idx=idx;
+      const info = rhymeInfo[idx];
+      const meterBreak = meterEstablished && syllCounts[idx]!==modeValue;
+      const syllClass = meterBreak ? 'flag' : '';
+      let stampClass = info.type==='true' ? 'true' : (info.type==='slant' ? 'slant' : '');
+      if(info.rhymeBreak) stampClass='flag';
+      let noteHtml='';
+      if(info.rhymeBreak) noteHtml='<span class="rhyme-note flag">Unrhymed line</span>';
+      else if(info.type==='true') noteHtml='<span class="rhyme-note true">True rhyme</span>';
+      else if(info.type==='slant') noteHtml=`<span class="rhyme-note slant">${SLANT_LABEL[info.reason]||'Slant rhyme'}</span>`;
+      else if(info.type==='echo') noteHtml='<span class="rhyme-note echo">Repeated word</span>';
+      row.innerHTML = `
+        <div class="lineno">${String(idx+1).padStart(2,'0')}</div>
+        <div class="syll ${syllClass}">${syllCounts[idx]}</div>
+        <div><div class="linetext">${formatInline(escapeHtml(line))}</div>${noteHtml}</div>
+        <div class="stamp ${stampClass}">${info.letter||''}</div>
+        <div></div>`;
+      rowsEl.appendChild(row);
+    });
+    fitPanel();
+    requestAnimationFrame(()=>drawThreads(rhymeInfo));
+    const totalSyll = syllCounts.reduce((a,b)=>a+b,0);
+    const count = workingLines.length;
+    stat1.textContent=count; stat2.textContent=totalSyll;
+    stat3.textContent = count ? (totalSyll/count).toFixed(1) : '–';
+    stat4.textContent = rhymeInfo.map(r=>r.letter||'–').join(' ');
+  }
+
+  function fitPanel(){
+    document.documentElement.style.setProperty('--panel-scale','1');
+    const natural = rowsEl.scrollHeight;
+    const available = window.innerHeight - 32;
+    let s = 1;
+    if(natural>available && available>60) s = Math.max(0.42, available/natural);
+    document.documentElement.style.setProperty('--panel-scale', s.toFixed(3));
+  }
+  function drawThreads(rhymeInfo){
+    const containerRect = rowsEl.getBoundingClientRect();
+    svg.setAttribute('height', rowsEl.scrollHeight); svg.setAttribute('width', 60); svg.innerHTML='';
+    const stamps = Array.from(rowsEl.querySelectorAll('.stamp'));
+    rhymeInfo.forEach(info=>{
+      if(info.matchIdx==null) return;
+      const a=stamps[info.matchIdx], b=stamps[info.idx]; if(!a||!b) return;
+      const ar=a.getBoundingClientRect(), br=b.getBoundingClientRect();
+      const y1=ar.top-containerRect.top+ar.height/2, y2=br.top-containerRect.top+br.height/2;
+      const x0=4, xBow=40;
+      const path=document.createElementNS('http://www.w3.org/2000/svg','path');
+      path.setAttribute('d', `M ${x0} ${y1} C ${xBow} ${y1}, ${xBow} ${y2}, ${x0} ${y2}`);
+      const cls = info.type==='true'?'true':(info.type==='slant'?'slant':'echo');
+      path.setAttribute('class', `thread-path ${cls}`);
+      svg.appendChild(path);
+    });
+  }
+
+  let phoneticsTimer;
+  function schedulePhoneticsRefresh(){
+    clearTimeout(phoneticsTimer);
+    if(mode==='poem') phoneticsStatus.textContent='checking pronunciation…';
+    phoneticsTimer = setTimeout(async ()=>{
+      const raw = editor.value.toLowerCase();
+      const words = raw.match(/[a-z]+/g) || [];
+      const unique = [...new Set(words)].filter(w=>!(w in phoneticsCache));
+      if(unique.length===0){ phoneticsStatus.textContent=''; return; }
+      try{ await Promise.all(unique.map(fetchPhonetics)); }catch(e){}
+      phoneticsStatus.textContent='';
+      if(mode==='poem') renderPoem();
+    }, 500);
+  }
+
+  /* ================= STORY ENGINE ================= */
+  const STOPWORDS = new Set(['the','a','an','and','or','but','of','to','in','on','at','for','with','as','is','was','were','are','be','been','being','it','its','this','that','these','those','he','she','they','we','you','i','his','her','their','our','your','my','so','if','then','than','not','no','yes','do','does','did','have','has','had','will','would','can','could','should','just','also','very','from','by','about','into','over','under','after','before','because','while','when','where','who','whom','which','what','there','here']);
+  const ADVERB_EXCEPTIONS = new Set(['only','family','early','likely','friendly','lonely','lovely','lively','silly','ugly','holy','apply','imply','supply','reply','comply','multiply','rely','ally','bully','jelly','belly','folly']);
+  const PASSIVE_IRREGULARS = new Set(['gone','done','seen','known','taken','given','written','spoken','broken','chosen','driven','eaten','fallen','forgotten','hidden','ridden','risen','shown','thrown','worn','torn','sung','drunk','swum','begun','run','come','become','made','said','held','left','felt','kept','met','sent','built','sold','told','found','heard','bought','caught','taught','brought','thought','sought','fought','led','put','set','hurt','cut','shut','spread','cost','bet']);
+  const BE_VERBS = new Set(['am','is','are','was','were','be','being','been']);
+  const MARKER_RE = /^\s*(#{1,3}\s+.+|\*{3,}|-{3,}|_{3,}|chapter\s+.+|scene\s+.+)\s*$/i;
+
+  function isAdverb(word){ return /^[a-z]+ly$/.test(word) && word.length>4 && !ADVERB_EXCEPTIONS.has(word); }
+
+  function tokenizeWithFlags(text, state){
+    const tokens = text.split(/(\s+)/);
+    const WINDOW = 45;
+    const result = tokens.map(tok=>{
+      if(tok==='' || /^\s+$/.test(tok)) return {text:tok, flags:[], isWord:false};
+      const clean = tok.toLowerCase().replace(/[^a-z']/g,'');
+      const flags=[];
+      if(clean){
+        state.wordIndex++;
+        if(isAdverb(clean)) flags.push('adverb');
+        if(!STOPWORDS.has(clean) && clean.length>3){
+          if(state.lastSeen[clean]!==undefined && (state.wordIndex-state.lastSeen[clean])<=WINDOW) flags.push('repeat');
+          state.lastSeen[clean]=state.wordIndex;
+        }
+      }
+      return {text:tok, flags, clean, isWord:!!clean};
+    });
+    const wordIdxs = result.map((t,i)=>t.isWord?i:null).filter(i=>i!==null);
+    for(let k=0;k<wordIdxs.length-1;k++){
+      const i=wordIdxs[k], j=wordIdxs[k+1];
+      const a=result[i].clean, b=result[j].clean;
+      if(BE_VERBS.has(a) && (/^[a-z]+ed$/.test(b) || PASSIVE_IRREGULARS.has(b))){
+        result[i].flags.push('passive'); result[j].flags.push('passive');
+      }
+    }
+    return result;
+  }
+  function tokensToHtml(tokens){
+    return tokens.map(t=>{
+      if(!t.isWord) return escapeHtml(t.text);
+      if(t.flags.length) return `<span class="hl ${[...new Set(t.flags)].join(' ')}">${escapeHtml(t.text)}</span>`;
+      return escapeHtml(t.text);
+    }).join('');
+  }
+
+  function analyzeStory(raw){
+    const lines = raw.split('\n');
+    const state = {lastSeen:{}, wordIndex:0};
+    let html=''; let paraLines=[]; const markers=[]; let paraCount=0;
+
+    function flushPara(){
+      if(paraLines.length){
+        const text = paraLines.join(' ');
+        const tokens = tokenizeWithFlags(text, state);
+        html += '<p>' + formatInline(tokensToHtml(tokens)) + '</p>';
+        paraLines = []; paraCount++;
+      }
+    }
+    lines.forEach((line, idx)=>{
+      const trimmed = line.trim();
+      if(trimmed===''){ flushPara(); return; }
+      if(MARKER_RE.test(trimmed)){
+        flushPara();
+        let label = trimmed.replace(/^#{1,3}\s*/,'');
+        if(/^[-*_]{3,}$/.test(trimmed)) label = 'Scene break ' + (markers.length+1);
+        markers.push({label, id:'scene-'+markers.length});
+        html += `<div class="scene-divider" id="scene-${markers.length-1}">${escapeHtml(label)}</div>`;
+        return;
+      }
+      paraLines.push(trimmed);
+    });
+    flushPara();
+
+    const cleanRaw = lines.map(l => MARKER_RE.test(l.trim()) ? '' : l).join(' ');
+    const sentences = cleanRaw.split(/(?<=[.!?])\s+/).map(s=>s.trim()).filter(Boolean);
+    const sentenceLengths = sentences.map(s=>s.split(/\s+/).filter(Boolean).length);
+    const wordCount = state.wordIndex;
+    const sentenceCount = sentences.length || (wordCount ? 1 : 0);
+
+    return { html, markers, paraCount, wordCount, sentenceCount, sentenceLengths };
+  }
+
+  function renderStory(){
+    const raw = editor.value;
+    if(!raw.trim()){
+      storyEmpty.style.display='block'; storyBody.style.display='none';
+      stat1.textContent='0'; stat2.textContent='0'; stat3.textContent='–'; stat4.textContent='–';
+      return;
+    }
+    storyEmpty.style.display='none'; storyBody.style.display='block';
+    const data = analyzeStory(raw);
+
+    storyProse.innerHTML = data.html;
+
+    if(data.markers.length){
+      sceneNav.style.display='flex';
+      sceneNav.innerHTML = data.markers.map(m=>`<button class="scene-nav-item" data-target="${m.id}">${escapeHtml(m.label)}</button>`).join('');
+      sceneNav.querySelectorAll('.scene-nav-item').forEach(btn=>{
+        btn.addEventListener('click', ()=>{
+          const target = document.getElementById(btn.dataset.target);
+          if(target) target.scrollIntoView({behavior:'smooth', block:'start'});
+        });
+      });
+    } else {
+      sceneNav.style.display='none'; sceneNav.innerHTML='';
+    }
+
+    const maxLen = Math.max(1, ...data.sentenceLengths);
+    rhythmChart.innerHTML = data.sentenceLengths.map(len=>{
+      const cls = len<8 ? 'short' : (len<=18 ? 'medium' : 'long');
+      const h = Math.max(3, Math.round((len/maxLen)*48));
+      return `<div class="rhythm-bar ${cls}" style="height:${h}px" title="${len} words"></div>`;
+    }).join('');
+
+    stat1.textContent = data.wordCount;
+    stat2.textContent = data.sentenceCount;
+    stat3.textContent = data.sentenceCount ? (data.wordCount/data.sentenceCount).toFixed(1) : '–';
+    stat4.textContent = data.paraCount;
+  }
+
+  /* ================= render dispatcher ================= */
+  function render(){
+    autoResize(editor);
+    if(mode==='poem') renderPoem(); else renderStory();
+  }
+
+  let resizeTimer;
+  window.addEventListener('resize', ()=>{ clearTimeout(resizeTimer); resizeTimer=setTimeout(render,120); });
+
+  /* ================= drafts (window.storage) ================= */
+  const saveDraftBtn=document.getElementById('saveDraftBtn'), exportBtn=document.getElementById('exportBtn');
+
+  /* ================= privacy lock ================= */
+  const lockBtn=document.getElementById('lockBtn'), lockPanel=document.getElementById('lockPanel'), lockPanelContent=document.getElementById('lockPanelContent');
+  let passwordHash = null;
+  let unlocked = false;
+
+  function simpleHashFallback(str){
+    let hash = 5381;
+    for(let i=0;i<str.length;i++){ hash = ((hash<<5)+hash) + str.charCodeAt(i); hash |= 0; }
+    return 'sh_' + (hash>>>0).toString(16);
+  }
+  async function sha256Hex(text){
+    try{
+      const enc = new TextEncoder().encode(text);
+      const buf = await crypto.subtle.digest('SHA-256', enc);
+      return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+    }catch(e){
+      return simpleHashFallback(text);
+    }
+  }
+  async function loadPasswordState(){
+    try{
+      const r = await storageAPI.get('privacy-lock-hash', false);
+      if(r && r.value) passwordHash = r.value;
+    }catch(e){}
+  }
+
+  let lockPanelView = 'main'; // 'main' | 'change' | 'remove'
+
+  function renderLockPanel(){
+    if(!passwordHash){
+      lockPanelContent.innerHTML = `
+        <div style="padding:10px;">
+          <div class="draft-title" style="margin-bottom:8px; white-space:normal;">Protect drafts &amp; scraps</div>
+          <input type="password" id="newPassInput" class="scrap-tag-input" placeholder="Choose a password" style="width:100%; margin-bottom:8px;" />
+          <input type="password" id="confirmPassInput" class="scrap-tag-input" placeholder="Confirm password" style="width:100%; margin-bottom:8px;" />
+          <button class="finder-btn" id="setPassBtn" style="width:100%;">Set password</button>
+          <div id="lockMsg" style="color:var(--pink); font-size:12px; margin-top:6px;"></div>
+          <p class="scraps-hint" style="margin-top:8px;">Basic privacy only, not real encryption — anyone with access to this browser's dev tools could still see the stored data.</p>
+        </div>`;
+      document.getElementById('setPassBtn').addEventListener('click', async ()=>{
+        const p1 = document.getElementById('newPassInput').value;
+        const p2 = document.getElementById('confirmPassInput').value;
+        const msg = document.getElementById('lockMsg');
+        if(!p1) return;
+        if(p1 !== p2){ msg.textContent = "Passwords don't match."; return; }
+        passwordHash = await sha256Hex(p1);
+        try{ await storageAPI.set('privacy-lock-hash', passwordHash, false); }catch(e){}
+        unlocked = true;
+        lockPanel.classList.remove('open');
+        renderScrapsList();
+      });
+      return;
+    }
+
+    if(lockPanelView === 'change'){
+      lockPanelContent.innerHTML = `
+        <div style="padding:10px;">
+          <div class="draft-title" style="margin-bottom:8px; white-space:normal;">Change password</div>
+          <input type="password" id="curPassInput" class="scrap-tag-input" placeholder="Current password" style="width:100%; margin-bottom:8px;" />
+          <input type="password" id="newPassInput2" class="scrap-tag-input" placeholder="New password" style="width:100%; margin-bottom:8px;" />
+          <input type="password" id="confirmPassInput2" class="scrap-tag-input" placeholder="Confirm new password" style="width:100%; margin-bottom:8px;" />
+          <div style="display:flex; gap:8px;">
+            <button class="finder-btn" id="submitChangeBtn" style="flex:1;">Update</button>
+            <button class="pill-btn" id="cancelChangeBtn" style="flex:0 0 auto; border-color:var(--card-border); color:var(--navy);">Cancel</button>
+          </div>
+          <div id="lockMsg" style="color:var(--pink); font-size:12px; margin-top:6px;"></div>
+        </div>`;
+      document.getElementById('cancelChangeBtn').addEventListener('click', ()=>{ lockPanelView='main'; renderLockPanel(); });
+      document.getElementById('submitChangeBtn').addEventListener('click', async ()=>{
+        const cur = document.getElementById('curPassInput').value;
+        const n1 = document.getElementById('newPassInput2').value;
+        const n2 = document.getElementById('confirmPassInput2').value;
+        const msg = document.getElementById('lockMsg');
+        if((await sha256Hex(cur)) !== passwordHash){ msg.textContent = 'Incorrect current password.'; return; }
+        if(!n1){ msg.textContent = 'Enter a new password.'; return; }
+        if(n1 !== n2){ msg.textContent = "New passwords don't match."; return; }
+        passwordHash = await sha256Hex(n1);
+        try{ await storageAPI.set('privacy-lock-hash', passwordHash, false); }catch(e){}
+        lockPanelView = 'main';
+        renderLockPanel();
+      });
+      return;
+    }
+
+    if(lockPanelView === 'remove'){
+      lockPanelContent.innerHTML = `
+        <div style="padding:10px;">
+          <div class="draft-title" style="margin-bottom:8px; white-space:normal;">Remove protection</div>
+          <input type="password" id="curPassInput2" class="scrap-tag-input" placeholder="Current password" style="width:100%; margin-bottom:8px;" />
+          <div style="display:flex; gap:8px;">
+            <button class="finder-btn" id="submitRemoveBtn" style="flex:1;">Remove</button>
+            <button class="pill-btn" id="cancelRemoveBtn" style="flex:0 0 auto; border-color:var(--card-border); color:var(--navy);">Cancel</button>
+          </div>
+          <div id="lockMsg" style="color:var(--pink); font-size:12px; margin-top:6px;"></div>
+        </div>`;
+      document.getElementById('cancelRemoveBtn').addEventListener('click', ()=>{ lockPanelView='main'; renderLockPanel(); });
+      document.getElementById('submitRemoveBtn').addEventListener('click', async ()=>{
+        const cur = document.getElementById('curPassInput2').value;
+        const msg = document.getElementById('lockMsg');
+        if((await sha256Hex(cur)) !== passwordHash){ msg.textContent = 'Incorrect password.'; return; }
+        passwordHash = null; unlocked = true;
+        try{ await storageAPI.delete('privacy-lock-hash', false); }catch(e){}
+        lockPanelView = 'main';
+        lockPanel.classList.remove('open');
+        renderLockPanel();
+        renderScrapsList();
+      });
+      return;
+    }
+
+    lockPanelContent.innerHTML = `
+      <div style="padding:10px;">
+        <div class="draft-title" style="margin-bottom:8px; white-space:normal;">${unlocked ? 'Unlocked for this session' : 'Drafts & scraps are protected'}</div>
+        <button class="finder-btn" id="changePassBtn" style="width:100%; margin-bottom:8px;">Change password</button>
+        <button class="draft-del" id="removePassBtn" style="width:100%; border-radius:16px; height:32px;">Remove protection</button>
+      </div>`;
+    document.getElementById('changePassBtn').addEventListener('click', ()=>{ lockPanelView='change'; renderLockPanel(); });
+    document.getElementById('removePassBtn').addEventListener('click', ()=>{ lockPanelView='remove'; renderLockPanel(); });
+  }
+  lockBtn.addEventListener('click', ()=>{ const open = lockPanel.classList.toggle('open'); if(open) renderLockPanel(); });
+  document.addEventListener('click', (ev)=>{ if(!lockPanel.contains(ev.target) && ev.target!==lockBtn) lockPanel.classList.remove('open'); });
+
+  function renderDraftsLockGate(){
+    draftsList.innerHTML = `
+      <div style="padding:14px;">
+        <div class="draft-title" style="margin-bottom:8px; white-space:normal;">🔒 Enter password to view drafts</div>
+        <input type="password" id="draftsUnlockInput" class="scrap-tag-input" style="width:100%; margin-bottom:8px;" placeholder="Password" />
+        <button class="finder-btn" id="draftsUnlockBtn" style="width:100%;">Unlock</button>
+        <div id="draftsUnlockError" style="color:var(--pink); font-size:12px; margin-top:6px;"></div>
+      </div>`;
+    async function attemptUnlock(){
+      const val = document.getElementById('draftsUnlockInput').value;
+      if((await sha256Hex(val)) === passwordHash){
+        unlocked = true;
+        loadDraftsList();
+        renderScrapsList();
+      } else {
+        document.getElementById('draftsUnlockError').textContent = 'Incorrect password.';
+      }
+    }
+    document.getElementById('draftsUnlockBtn').addEventListener('click', attemptUnlock);
+    document.getElementById('draftsUnlockInput').addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); attemptUnlock(); } });
+  }
+  const draftsToggle=document.getElementById('draftsToggle'), draftsPanel=document.getElementById('draftsPanel'), draftsList=document.getElementById('draftsList');
+  const saveStatus=document.getElementById('saveStatus');
+
+  function downloadText(filename, text){
+    const blob = new Blob([text], {type:'text/plain'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href=url; a.download=filename;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+  exportBtn.addEventListener('click', ()=>{
+    const text = editor.value; if(!text.trim()) return;
+    const name = titleFromText(text).replace(/[^\w\s-]/g,'').trim().replace(/\s+/g,'-').toLowerCase() || (mode==='poem'?'poem':'story');
+    downloadText(name+'.txt', text);
+  });
+
+  let autosaveTimer;
+  function scheduleAutosave(){
+    clearTimeout(autosaveTimer);
+    autosaveTimer = setTimeout(async ()=>{
+      try{ await storageAPI.set('autosave-'+mode, JSON.stringify({text: editor.value, updatedAt: Date.now()}), false); }catch(e){}
+    }, 700);
+  }
+  const scrapInput=document.getElementById('scrapInput'), scrapTagInput=document.getElementById('scrapTagInput');
+  const scrapColorInput=document.getElementById('scrapColorInput'), scrapAddBtn=document.getElementById('scrapAddBtn');
+  const scrapsList=document.getElementById('scrapsList'), scrapSearch=document.getElementById('scrapSearch'), scrapTagFilters=document.getElementById('scrapTagFilters');
+
+  let cachedScraps = [];
+  let activeTagFilter = null;
+
+  async function addScrap(text, tagLabel, tagColor){
+    const trimmed = text.trim();
+    if(!trimmed) return false;
+    const key = 'scrap:' + Date.now() + '-' + Math.random().toString(36).slice(2,7);
+    const payload = JSON.stringify({
+      text: trimmed,
+      tag: tagLabel ? {label: tagLabel.trim(), color: tagColor || '#5b3fa6'} : null,
+      mode: mode,
+      savedAt: Date.now()
+    });
+    let ok = true;
+    try{ await storageAPI.set(key, payload, false); }catch(e){ ok = false; }
+    await refreshScrapsFromStorage();
+    return ok;
+  }
+
+  async function refreshScrapsFromStorage(){
+    try{
+      const listResult = await storageAPI.list('scrap:', false);
+      const keys = (listResult && listResult.keys) ? listResult.keys : [];
+      const entries=[];
+      for(const key of keys){
+        try{
+          const res = await storageAPI.get(key, false);
+          if(res && res.value){
+            const d = JSON.parse(res.value);
+            entries.push({key, text:d.text||'', tag:d.tag||null, mode:d.mode||'', savedAt:d.savedAt||0});
+          }
+        }catch(e){}
+      }
+      entries.sort((a,b)=>b.savedAt-a.savedAt);
+      cachedScraps = entries;
+    }catch(e){
+      cachedScraps = [];
+    }
+    renderScrapsList();
+  }
+
+  function renderScrapsList(){
+    if(passwordHash && !unlocked){
+      scrapTagFilters.innerHTML = '';
+      scrapsList.innerHTML = `
+        <div style="padding:14px; text-align:center;">
+          <div class="draft-title" style="margin-bottom:8px;">🔒 Locked</div>
+          <input type="password" id="scrapsUnlockInput" class="scrap-tag-input" style="width:100%; margin-bottom:8px;" placeholder="Password" />
+          <button class="finder-btn" id="scrapsUnlockBtn" style="width:100%;">Unlock</button>
+          <div id="scrapsUnlockError" style="color:var(--pink); font-size:12px; margin-top:6px;"></div>
+        </div>`;
+      const attemptScrapsUnlock = async ()=>{
+        const val = document.getElementById('scrapsUnlockInput').value;
+        if((await sha256Hex(val)) === passwordHash){ unlocked = true; renderScrapsList(); }
+        else { document.getElementById('scrapsUnlockError').textContent = 'Incorrect password.'; }
+      };
+      document.getElementById('scrapsUnlockBtn').addEventListener('click', attemptScrapsUnlock);
+      document.getElementById('scrapsUnlockInput').addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); attemptScrapsUnlock(); } });
+      return;
+    }
+    // build the tag-filter chip row from every tag currently in use
+    const uniqueTags = [];
+    const seen = new Set();
+    cachedScraps.forEach(e=>{
+      if(e.tag && !seen.has(e.tag.label)){ seen.add(e.tag.label); uniqueTags.push(e.tag); }
+    });
+    if(uniqueTags.length===0){
+      scrapTagFilters.innerHTML = '';
+    } else {
+      const allChip = `<button class="tag-filter-chip ${activeTagFilter===null?'active':''}" data-tag="" style="${activeTagFilter===null?'background:var(--navy);':''}">All</button>`;
+      const chips = uniqueTags.map(t=>{
+        const isActive = activeTagFilter===t.label;
+        const style = isActive ? `background:${t.color};` : `color:${t.color}; border-color:${t.color}88;`;
+        return `<button class="tag-filter-chip ${isActive?'active':''}" data-tag="${escapeHtml(t.label)}" style="${style}">${escapeHtml(t.label)}</button>`;
+      }).join('');
+      scrapTagFilters.innerHTML = allChip + chips;
+      scrapTagFilters.querySelectorAll('.tag-filter-chip').forEach(chip=>{
+        chip.addEventListener('click', ()=>{
+          activeTagFilter = chip.dataset.tag || null;
+          renderScrapsList();
+        });
+      });
+    }
+
+    const query = scrapSearch.value.trim().toLowerCase();
+    const filtered = cachedScraps.filter(e=>{
+      if(activeTagFilter && (!e.tag || e.tag.label !== activeTagFilter)) return false;
+      if(query){
+        const haystack = (e.text + ' ' + (e.tag ? e.tag.label : '')).toLowerCase();
+        if(!haystack.includes(query)) return false;
+      }
+      return true;
+    });
+
+    if(filtered.length===0){
+      scrapsList.innerHTML = `<div class="scraps-list-empty">${cachedScraps.length===0 ? 'No scraps saved yet.' : 'No scraps match your search.'}</div>`;
+      return;
+    }
+    scrapsList.innerHTML='';
+    filtered.forEach(entry=>{
+      const row = document.createElement('div'); row.className='scrap-item';
+      const tagHtml = entry.tag
+        ? `<span class="scrap-tag" style="background:${entry.tag.color}22; color:${entry.tag.color}; border-color:${entry.tag.color}88;">${escapeHtml(entry.tag.label)}</span>`
+        : '';
+      const modeHtml = entry.mode ? `<span class="scrap-mode-tag">${escapeHtml(entry.mode)}</span>` : '';
+      row.innerHTML = `
+        <button class="scrap-del" title="Delete scrap">×</button>
+        <div class="scrap-meta">${tagHtml}<span class="scrap-date">${formatDate(entry.savedAt)}</span>${modeHtml}</div>
+        <div class="scrap-text">${escapeHtml(entry.text)}</div>`;
+      row.querySelector('.scrap-del').addEventListener('click', async ()=>{
+        try{ await storageAPI.delete(entry.key, false); }catch(e){}
+        refreshScrapsFromStorage();
+      });
+      scrapsList.appendChild(row);
+    });
+  }
+
+  scrapSearch.addEventListener('input', renderScrapsList);
+
+  scrapAddBtn.addEventListener('click', async ()=>{
+    if(!scrapInput.value.trim()) return;
+    await addScrap(scrapInput.value, scrapTagInput.value, scrapColorInput.value);
+    scrapInput.value = ''; scrapTagInput.value = '';
+    autoResize(scrapInput);
+  });
+  scrapInput.addEventListener('input', ()=> autoResize(scrapInput));
+
+  async function restoreAutosave(){
+    await loadPasswordState();
+    try{
+      const p = await storageAPI.get('autosave-poem', false);
+      if(p && p.value){ const d=JSON.parse(p.value); if(d && d.text) poemText = d.text; }
+    }catch(e){}
+    try{
+      const s = await storageAPI.get('autosave-story', false);
+      if(s && s.value){ const d=JSON.parse(s.value); if(d && d.text) storyText = d.text; }
+    }catch(e){}
+    editor.value = mode==='poem' ? poemText : storyText;
+    refreshScrapsFromStorage();
+  }
+
+  function titleFromText(text){
+    const firstLine = text.split('\n').map(l=>l.trim()).find(l=>l.length>0);
+    if(!firstLine) return mode==='poem' ? 'Untitled poem' : 'Untitled story';
+    return firstLine.length>42 ? firstLine.slice(0,42)+'…' : firstLine;
+  }
+  function formatDate(ts){
+    const d = new Date(ts);
+    return d.toLocaleDateString(undefined,{month:'short', day:'numeric'}) + ' · ' + d.toLocaleTimeString(undefined,{hour:'numeric', minute:'2-digit'});
+  }
+
+  saveDraftBtn.addEventListener('click', async ()=>{
+    const text = editor.value; if(!text.trim()) return;
+    const key = 'draft:'+mode+':'+Date.now();
+    const customName = draftNameInput.value.trim();
+    const payload = JSON.stringify({title: customName || titleFromText(text), text, savedAt: Date.now()});
+    try{
+      await storageAPI.set(key, payload, false);
+      saveStatus.textContent='Saved'; setTimeout(()=>{saveStatus.textContent='';},1800);
+      draftNameInput.value = '';
+    }catch(e){
+      saveStatus.textContent='Could not save'; setTimeout(()=>{saveStatus.textContent='';},2200);
+    }
+  });
+
+  async function loadDraftsList(){
+    draftsList.innerHTML = '<div class="drafts-empty">Loading…</div>';
+    const prefix = 'draft:'+mode+':';
+    try{
+      const listResult = await storageAPI.list(prefix, false);
+      const keys = (listResult && listResult.keys) ? listResult.keys : [];
+      if(keys.length===0){ draftsList.innerHTML = `<div class="drafts-empty">No saved ${mode} drafts yet.</div>`; return; }
+      const entries=[];
+      for(const key of keys){
+        try{
+          const res = await storageAPI.get(key, false);
+          if(res && res.value){
+            const data = JSON.parse(res.value);
+            entries.push({key, title:data.title||'Untitled', text:data.text||'', savedAt:data.savedAt||0});
+          }
+        }catch(e){}
+      }
+      entries.sort((a,b)=>b.savedAt-a.savedAt);
+      if(entries.length===0){ draftsList.innerHTML = `<div class="drafts-empty">No saved ${mode} drafts yet.</div>`; return; }
+      draftsList.innerHTML='';
+      entries.forEach(entry=>{
+        const row=document.createElement('div'); row.className='draft-item';
+        row.innerHTML = `<div class="draft-info"><div class="draft-title">${escapeHtml(entry.title)}</div><div class="draft-date">${formatDate(entry.savedAt)}</div></div><button class="draft-del" title="Delete draft">×</button>`;
+        row.querySelector('.draft-info').addEventListener('click', ()=>{
+          editor.value = entry.text; render(); if(mode==='poem') schedulePhoneticsRefresh();
+          draftsPanel.classList.remove('open');
+        });
+        row.querySelector('.draft-del').addEventListener('click', async (ev)=>{
+          ev.stopPropagation();
+          try{ await storageAPI.delete(entry.key, false); }catch(e){}
+          loadDraftsList();
+        });
+        draftsList.appendChild(row);
+      });
+    }catch(e){
+      draftsList.innerHTML = '<div class="drafts-empty">Couldn\'t load drafts.</div>';
+    }
+  }
+  draftsToggle.addEventListener('click', ()=>{
+    const open=draftsPanel.classList.toggle('open');
+    if(open){
+      if(passwordHash && !unlocked) renderDraftsLockGate();
+      else loadDraftsList();
+    }
+  });
+  document.addEventListener('click', (ev)=>{ if(!draftsPanel.contains(ev.target) && ev.target!==draftsToggle) draftsPanel.classList.remove('open'); });
+
+  /* ================= finder (rhyme / synonym) ================= */
+  const finderBtn=document.getElementById('finderBtn'), finderResults=document.getElementById('finderResults');
+  async function findWords(){
+    const w = finderInput.value.trim().toLowerCase();
+    if(!w) return;
+    finderResults.innerHTML = '<p class="finder-status">Searching…</p>';
+    try{
+      if(mode==='poem'){
+        const [trueRes, nearRes] = await Promise.all([
+          fetch('https://api.datamuse.com/words?rel_rhy='+encodeURIComponent(w)+'&max=30').then(r=>r.json()),
+          fetch('https://api.datamuse.com/words?rel_nry='+encodeURIComponent(w)+'&max=30').then(r=>r.json())
+        ]);
+        const trueWords=(trueRes||[]).map(r=>r.word);
+        const trueSet=new Set(trueWords);
+        const nearWords=(nearRes||[]).map(r=>r.word).filter(x=>!trueSet.has(x));
+        if(trueWords.length===0 && nearWords.length===0){ finderResults.innerHTML='<p class="finder-status">No rhymes found — try a simpler or more common word.</p>'; return; }
+        let html='';
+        if(trueWords.length) html += `<div class="chip-group"><div class="chip-group-label">True rhymes</div><div class="chip-row">${trueWords.map(word=>`<button class="chip true" data-word="${escapeHtml(word)}">${escapeHtml(word)}</button>`).join('')}</div></div>`;
+        if(nearWords.length) html += `<div class="chip-group"><div class="chip-group-label">Near / slant rhymes</div><div class="chip-row">${nearWords.map(word=>`<button class="chip near" data-word="${escapeHtml(word)}">${escapeHtml(word)}</button>`).join('')}</div></div>`;
+        finderResults.innerHTML = html;
+      } else {
+        const res = await fetch('https://api.datamuse.com/words?ml='+encodeURIComponent(w)+'&max=30').then(r=>r.json());
+        const words = (res||[]).map(r=>r.word);
+        if(words.length===0){ finderResults.innerHTML='<p class="finder-status">No similar words found.</p>'; return; }
+        finderResults.innerHTML = `<div class="chip-group"><div class="chip-group-label">Similar words</div><div class="chip-row">${words.map(word=>`<button class="chip near" data-word="${escapeHtml(word)}">${escapeHtml(word)}</button>`).join('')}</div></div>`;
+      }
+      finderResults.querySelectorAll('.chip').forEach(chip=>{
+        chip.addEventListener('click', async ()=>{
+          const word = chip.dataset.word;
+          const tagLabel = mode==='poem' ? 'rhyme' : 'word choice';
+          const saveStatusEl = document.getElementById('finderSaveStatus');
+          const ok = await addScrap(word, tagLabel, mode==='poem' ? '#0e9c8f' : '#d6417f');
+          if(ok){
+            chip.textContent = '✓ ' + word;
+            chip.disabled = true;
+            chip.style.opacity = '0.55';
+            saveStatusEl.style.color = 'var(--teal)';
+            saveStatusEl.textContent = `Saved "${word}" to Scraps.`;
+          } else {
+            saveStatusEl.style.color = 'var(--pink)';
+            saveStatusEl.textContent = `Couldn't save "${word}" — try again.`;
+          }
+          setTimeout(()=>{ if(saveStatusEl.textContent.includes(word)) saveStatusEl.textContent = ''; }, 2500);
+        });
+      });
+    }catch(e){
+      finderResults.innerHTML = '<p class="finder-status">Couldn\'t reach the word dictionary. Check your connection and try again.</p>';
+    }
+  }
+  finderBtn.addEventListener('click', findWords);
+  finderInput.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); findWords(); } });
+
+  /* ================= wild card ================= */
+  const POEM_TYPES = ['Sonnet','Shakespearean sonnet','Petrarchan sonnet','Haiku','Tanka','Limerick','Free verse','Villanelle','Sestina','Ode','Elegy','Ballad','Acrostic','Cinquain','Pantoum','Ghazal','Concrete (shape) poem','Ekphrastic poem','Prose poem'];
+  const STORY_TYPES = ['Short story','Flash fiction','Micro fiction','Mystery','Thriller','Romance','Science fiction','Fantasy','Horror','Historical fiction','Literary fiction','Magical realism','Fairy tale','Fable','Dystopian','Coming-of-age','Adventure','Comedy / satire','Slice of life','Epistolary (letters or diary)','Noir'];
+  const TOPIC_BANK = [
+    'an abandoned lighthouse','a floating night market','a subway station that shouldn\'t exist','a greenhouse in winter','a border crossing at midnight','an attic full of unsent letters','a diner at the edge of a desert highway','a library after closing','a shipwreck museum','a train that never stops','a carnival packing up for the night','a bridge between two countries','a bakery that only opens in fog','a lake with no bottom', 'a hotel built for layovers no one remembers booking',
+    'a retired assassin who now bakes bread','a lighthouse keeper who has never seen the ocean','a child who can hear colors','a con artist who forgot their own name','a ghost who still pays rent','a widow who talks to her houseplants','a fortune teller afraid of her own predictions','a mapmaker for places that don\'t exist','a translator for a language no one speaks anymore','an astronaut afraid of heights','a locksmith who can\'t lock her own door','a taxidermist with a soft heart','a night-shift nurse who moonlights as a poet','a thief who only steals memories',
+    'a key that opens nothing you own','a pocket watch that runs backward','a letter never sent','a chipped teacup passed down for generations','a compass that points to what you\'ve lost','a photograph missing one person','a jar of collected silences','a coat that isn\'t yours','a music box playing a song no one recognizes','a map with one location circled','a typewriter missing the letter E','a suitcase packed for a trip that never happened','a mirror that shows yesterday','a seed that won\'t grow anywhere else'
+  ];
+  const CHALLENGE_WORDS = ['ubiquitous','ephemeral','serendipity','mellifluous','labyrinthine','iridescent','quixotic','petrichor','saudade','wanderlust','cacophony','luminous','nostalgic','threadbare','effervescent','clandestine','whimsical','melancholy','resilient','tangential','incandescent','bittersweet','solitude','tenacious','evocative'];
+  const CHALLENGE_MENTIONS = ['a pizza place','a broken umbrella','a stray cat','a mispronounced name','a power outage','a wrong number call','a lost earring','a parking ticket','a karaoke machine','a vending machine that\'s out of order','a rainstorm that wasn\'t forecast','a grandmother\'s recipe','a flat tire','a voicemail that\'s never been played','an ex who shows up unannounced','a fortune cookie','a neighbor\'s wifi password','a childhood nickname','a delayed flight','a spilled cup of coffee'];
+
+  const TYPE_DEFINITIONS = {
+    'Sonnet': { def:'A 14-line poem, usually built around a single deep feeling, with a set rhyme pattern.', format:'14 lines, typically 10 syllables per line (iambic pentameter). Exact rhyme scheme depends on which sonnet type.', example:'Think of any Shakespeare sonnet: 14 lines building one idea, then a turn or resolution near the end.' },
+    'Shakespearean sonnet': { def:'A 14-line sonnet in three four-line sections plus a closing couplet.', format:'Rhyme scheme ABAB CDCD EFEF GG — three 4-line quatrains, then a 2-line couplet.', example:'Lines 1–4 rhyme A-B-A-B, lines 5–8 rhyme C-D-C-D, lines 9–12 rhyme E-F-E-F, then lines 13–14 rhyme G-G and deliver the twist or punchline.' },
+    'Petrarchan sonnet': { def:'A 14-line sonnet split into a problem and a resolution.', format:'An 8-line "octave" (rhyme ABBAABBA) poses a question or problem; a 6-line "sestet" (rhyme CDECDE or similar) resolves it.', example:'Lines 1–8 ask "what is love?" in rhyme A-B-B-A-A-B-B-A; lines 9–14 answer it in a new pattern like C-D-E-C-D-E.' },
+    'Haiku': { def:'A three-line poem that captures a single moment, often from nature.', format:'3 lines, syllables 5-7-5. No required rhyme.', example:'"An old silent pond (5) / A frog jumps into the pond— (7) / Splash! Silence again. (5)"' },
+    'Tanka': { def:'Like a haiku but longer, adding a personal reflection.', format:'5 lines, syllables 5-7-5-7-7. No required rhyme.', example:'Start like a haiku (5-7-5), then add two more 7-syllable lines that reflect on or deepen the feeling.' },
+    'Limerick': { def:'A bouncy, usually funny five-line poem.', format:'5 lines, rhyme AABBA. Lines 1, 2, 5 are longer (~8-9 syllables); lines 3, 4 are shorter (~5-6 syllables).', example:'"There once was a cat from Peru (A) / Who dreamed of a life at the zoo (A) / She practiced her roar (B) / Then fell on the floor (B) / And decided a nap would just do (A)."' },
+    'Free verse': { def:'Poetry with no fixed rhyme or meter.', format:'No required rhyme, syllable count, or line length — line breaks follow the poem\'s natural rhythm instead of a formula.', example:'Write however feels natural; a line can be one word or twenty, wherever the break serves the meaning.' },
+    'Villanelle': { def:'A poem built from two repeating refrain lines.', format:'19 lines: five 3-line stanzas + one 4-line closing stanza. Only 2 rhyme sounds total. Line 1 and Line 3 alternate as the last line of each stanza, then both appear together at the very end.', example:'Like Dylan Thomas\'s "Do Not Go Gentle Into That Good Night" — the lines "Do not go gentle..." and "Rage, rage against..." keep resurfacing throughout.' },
+    'Sestina': { def:'A poem that repeats six end-words in a rotating pattern instead of rhyming.', format:'39 lines: six 6-line stanzas + a 3-line closing. No rhyme — the same 6 end-words reappear in a shifting order each stanza, then all 6 show up in the final 3 lines.', example:'If your 6 end-words are house, light, door, water, name, stone — every stanza reuses those same 6 words at line-ends, just reshuffled.' },
+    'Ode': { def:'A poem that celebrates or honors a person, thing, or idea.', format:'No fixed rhyme or length — usually several stanzas of praise, often addressed directly to the subject ("O tree..." / "You, morning coffee...").', example:'Like Pablo Neruda\'s "Ode to My Socks" — a whole poem devoted to admiring something ordinary.' },
+    'Elegy': { def:'A poem of mourning, reflecting on loss or death.', format:'No fixed structure — usually moves from grief, to memory or celebration of what was lost, to some form of acceptance.', example:'A poem for a lost pet that moves from "I can\'t believe you\'re gone" to a favorite memory to "I\'ll carry you with me."' },
+    'Ballad': { def:'A rhyming poem that tells a story, often meant to be sung.', format:'Usually 4-line stanzas, rhyme ABCB or ABAB, alternating longer and shorter lines.', example:'Like an old folk song lyric — a hero\'s journey, a tragic love, a ghost story — told in simple, sing-song stanzas.' },
+    'Acrostic': { def:'A poem where the first letters spell something out.', format:'The first letter of each line spells a word or phrase, read top to bottom.', example:'For the word CAT: "Curling up by the fire / Always watching the door / Tail flicking with every sound."' },
+    'Cinquain': { def:'A five-line poem often built on a word or syllable count.', format:'5 lines, commonly by word count: 1 word / 2 words / 3 words / 4 words / 1 word (or a 2-4-6-8-2 syllable version).', example:'"Ocean / Deep, endless / Waves crash, retreat, return / Salt air fills my lungs completely / Home."' },
+    'Pantoum': { def:'A poem that echoes its own lines forward.', format:'Any length, 4-line stanzas. Lines 2 and 4 of each stanza repeat as lines 1 and 3 of the next stanza.', example:'Stanza 1 lines: A, B, C, D. Stanza 2 lines: B, E, D, F. Stanza 3 lines: E, G, F, H — and so on.' },
+    'Ghazal': { def:'A poem of couplets that all end the same way.', format:'A series of independent 2-line couplets, each ending on the same repeated word or phrase, often with a rhyme just before it.', example:'Every couplet could end on the word "alone" — "The city sleeps, and I am alone... / Even my shadow leaves me alone..."' },
+    'Concrete (shape) poem': { def:'A poem whose shape mirrors its subject.', format:'No rhyme or meter rule — words are arranged on the page so the poem\'s visual shape matches what it\'s about.', example:'A poem about rain, with the words literally trickling down the page in a raindrop shape.' },
+    'Ekphrastic poem': { def:'A poem written in response to another piece of art.', format:'No fixed structure — written about or in reaction to a specific painting, photo, sculpture, or piece of music.', example:'Look at a painting (real or imagined) and write what the person in it might be thinking, or what\'s happening just outside the frame.' },
+    'Prose poem': { def:'A poem written in paragraph form.', format:'Full sentences and paragraphs, no line breaks — but still built on rhythm, imagery, and compression like a poem.', example:'A paragraph where every sentence carries the emotional weight a poem\'s line usually would — dense, image-rich, no wasted words.' },
+    'Short story': { def:'A complete, self-contained story short enough to read in one sitting.', format:'Roughly 1,500–7,500 words. One central conflict, a handful of characters, resolved by the end.', example:'A woman finds an old photograph while cleaning her late mother\'s house and unravels a family secret in one afternoon.' },
+    'Flash fiction': { def:'An extremely short complete story.', format:'Under 1,000 words. One scene, one moment, one turn — no room for subplots.', example:'A single phone call between two people who haven\'t spoken in a decade, told in real time.' },
+    'Micro fiction': { def:'An even tinier complete story.', format:'Under 300 words, sometimes just one sentence. One sharp image or twist.', example:'"She kept setting two plates for dinner, even now." — a complete story in one line.' },
+    'Mystery': { def:'A story built around a puzzle or crime to solve.', format:'A crime or puzzle introduced early, clues planted throughout, a reveal or resolution at the end.', example:'A locked-room murder where the detective realizes the killer is the one person no one thought to suspect.' },
+    'Thriller': { def:'A fast-paced story that keeps tension high.', format:'High stakes established fast, constant forward momentum, danger escalating toward a climax.', example:'A woman realizes her rideshare driver is taking the wrong route — and has 10 minutes to figure out why.' },
+    'Romance': { def:'A story centered on a developing romantic relationship.', format:'Two people meet, face obstacles keeping them apart, and (traditionally) end up together by the close.', example:'Rival coffee shop owners on the same block slowly fall for each other over a shared love of the same terrible pun.' },
+    'Science fiction': { def:'A story grounded in speculative science or technology.', format:'Built on a "what if" scientific idea, with internal rules that stay consistent throughout.', example:'A colony on Mars discovers their entire memories of Earth were implanted, not real.' },
+    'Fantasy': { def:'A story set in a world with magic or the supernatural.', format:'A world with its own magic system or supernatural rules, followed consistently throughout.', example:'A baker discovers her bread rises with real magic — and someone dangerous wants the recipe.' },
+    'Horror': { def:'A story designed to frighten or unsettle.', format:'Dread builds steadily; something is wrong from the start, escalating toward a frightening climax.', example:'A family moves into a house where the mirrors show the rooms exactly one second in the past.' },
+    'Historical fiction': { def:'A story set in a real past era.', format:'A real historical period or setting, often blending invented characters with real events.', example:'A seamstress in 1920s Paris gets pulled into the underground of the city\'s early fashion rebellion.' },
+    'Literary fiction': { def:'A story focused on character and theme over plot.', format:'Loose or flexible structure; emphasis on internal change, voice, and meaning over external events.', example:'A quiet story about a father and adult daughter driving cross-country, saying almost nothing that matters and everything that does.' },
+    'Magical realism': { def:'A realistic world with a touch of the impossible.', format:'An ordinary setting where one or two magical elements are treated as completely unremarkable.', example:'A grandmother\'s tears water the garden into instant, impossible bloom — and no one in the family finds this strange.' },
+    'Fairy tale': { def:'A short, whimsical story with a lesson.', format:'Often framed with a "once upon a time" opening, clear good/bad forces, magic, and a simple resolution or lesson.', example:'A girl trades her voice for a pair of shoes that let her outrun grief — and must learn to speak again.' },
+    'Fable': { def:'A short story that ends in a stated moral.', format:'Short, often with animal characters standing in for human traits, ending in an explicit moral.', example:'A tortoise and a hare race — moral: slow and steady wins the race.' },
+    'Dystopian': { def:'A story set in a broken or oppressive future.', format:'A controlled or broken future society; a protagonist who starts to see cracks in the system.', example:'In a city where emotions are regulated by law, one technician starts feeling things she\'s not allowed to feel.' },
+    'Coming-of-age': { def:'A story about growing up or self-discovery.', format:'Follows a young protagonist through a formative experience that changes how they see themselves or the world.', example:'A teenager spends one final summer with her childhood best friend before they leave for different lives.' },
+    'Adventure': { def:'A story driven by action and a journey.', format:'A quest structure — a goal, obstacles along the way, and a physical challenge to overcome.', example:'Two strangers are stranded on a remote island and must cross it on foot before a storm arrives.' },
+    'Comedy / satire': { def:'A story that pokes fun through humor.', format:'Exaggeration, irony, or absurdity used to poke fun at a real behavior, institution, or idea.', example:'A corporate office where every meeting could\'ve been an email — until the emails start replying on their own.' },
+    'Slice of life': { def:'A small, real window into everyday life.', format:'Low external drama; focus on small, real, human moments rather than a big plot.', example:'A single morning in a diner, told through the regulars who pass through before 9am.' },
+    'Epistolary (letters or diary)': { def:'A story told through letters or diary entries.', format:'Told entirely through letters, diary entries, texts, or similar documents — no traditional narration.', example:'A story told through a year of postcards between two friends who never manage to be in the same city at once.' },
+    'Noir': { def:'A dark, cynical crime story.', format:'A cynical tone, a morally gray protagonist (often a detective), a shadowy urban setting, and a crime at the center.', example:'A washed-up private investigator takes one last case that turns out to implicate someone he trusts.' }
+  };
+
+  function pickRandom(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+  /* ================= ekphrastic artwork puller ================= */
+  async function fetchRandomArtwork(){
+    for(let attempt=0; attempt<5; attempt++){
+      try{
+        const page = Math.floor(Math.random()*500) + 1;
+        const res = await fetch(`https://api.artic.edu/api/v1/artworks?page=${page}&limit=1&fields=title,artist_display,date_display,image_id`);
+        const data = await res.json();
+        const item = data && data.data && data.data[0];
+        if(item && item.image_id){
+          return {
+            title: item.title || 'Untitled',
+            artist: (item.artist_display || 'Unknown artist').split('\n')[0],
+            date: item.date_display || '',
+            imageUrl: `https://www.artic.edu/iiif/2/${item.image_id}/full/600,/0/default.jpg`
+          };
+        }
+      }catch(e){ /* try another page */ }
+    }
+    return null;
+  }
+  function artworkHtml(art){
+    if(!art) return `<div class="wc-def">Couldn't load artwork right now — try again.</div>`;
+    return `<div class="artwork-box">
+        <img src="${art.imageUrl}" alt="${escapeHtml(art.title)}" class="artwork-img" />
+        <div class="artwork-caption"><strong>${escapeHtml(art.title)}</strong> — ${escapeHtml(art.artist)}${art.date ? ', ' + escapeHtml(art.date) : ''}<br><span class="artwork-source">via the Art Institute of Chicago</span></div>
+      </div>`;
+  }
+
+  /* ================= poem style + shape templates ================= */
+  const SHAPES = {
+    diamond:     { label:'Diamond',            align:'center', widths:[2,4,6,8,10,12,10,8,6,4,2] },
+    triangle:    { label:'Triangle',           align:'center', widths:[2,4,6,8,10,12] },
+    invtriangle: { label:'Inverted triangle',  align:'center', widths:[12,10,8,6,4,2] },
+    hourglass:   { label:'Hourglass',          align:'center', widths:[12,10,8,4,2,2,4,8,10,12] },
+    heart:       { label:'Heart (approximate)',align:'center', widths:[6,10,6,10,14,12,10,8,6,4,2] },
+    teardrop:    { label:'Teardrop',           align:'center', widths:[2,4,6,8,10,12,12,10,6,2] },
+    staircase:   { label:'Staircase',          align:'left',   indents:[0,2,4,6,8,10,12], lineLength:10 }
+  };
+
+  function buildShapeSkeleton(shapeKey){
+    const shape = SHAPES[shapeKey];
+    if(!shape) return '';
+    if(shape.align === 'left'){
+      return shape.indents.map(indent => ' '.repeat(indent) + '_'.repeat(shape.lineLength)).join('\n');
+    }
+    return shape.widths.map(w => '_'.repeat(w)).join('\n');
+  }
+
+  function applyShapeToEditor(shapeKey, skipCheck){
+    const shape = SHAPES[shapeKey];
+    if(!shape) return;
+    if(mode !== 'poem') switchMode('poem');
+    if(editor.value.trim() && !skipCheck){
+      let bar = document.getElementById('shapeWarnBar');
+      if(!bar){
+        bar = document.createElement('div');
+        bar.id = 'shapeWarnBar';
+        bar.style.cssText = 'width:100%; margin-top:8px; font-family:var(--font-ui,\'Space Grotesk\'), sans-serif; font-size:12px; color:var(--pink); display:flex; align-items:center; gap:8px; flex-wrap:wrap;';
+        shapeToolGroup.appendChild(bar);
+      }
+      bar.innerHTML = `<span>Replace your current poem text with this shape?</span>
+        <button id="shapeWarnYes" style="border:1px solid var(--pink); background:var(--pink); color:#fff; font-size:11.5px; padding:4px 10px; border-radius:12px; cursor:pointer;">Yes, replace</button>
+        <button id="shapeWarnNo" style="border:1px solid var(--card-border); background:#fff; color:var(--navy); font-size:11.5px; padding:4px 10px; border-radius:12px; cursor:pointer;">Cancel</button>`;
+      document.getElementById('shapeWarnYes').addEventListener('click', ()=>{ bar.remove(); applyShapeToEditor(shapeKey, true); });
+      document.getElementById('shapeWarnNo').addEventListener('click', ()=> bar.remove());
+      return;
+    }
+    const existingBar = document.getElementById('shapeWarnBar');
+    if(existingBar) existingBar.remove();
+    editor.style.textAlign = shape.align === 'left' ? 'left' : 'center';
+    editor.value = buildShapeSkeleton(shapeKey);
+    render(); autoResize(editor); scheduleAutosave();
+  }
+
+  const poemStyleSelect = document.getElementById('poemStyleSelect');
+  const shapeToolGroup = document.getElementById('shapeToolGroup');
+  const shapeSelect = document.getElementById('shapeSelect');
+  const styleReference = document.getElementById('styleReference');
+  const SHAPE_POEM_NAME = 'Concrete (shape) poem';
+
+  POEM_TYPES.forEach(t=>{
+    const opt = document.createElement('option'); opt.value = t; opt.textContent = t;
+    poemStyleSelect.appendChild(opt);
+  });
+  Object.entries(SHAPES).forEach(([key, s])=>{
+    const opt = document.createElement('option'); opt.value = key; opt.textContent = s.label;
+    shapeSelect.appendChild(opt);
+  });
+
+  function onPoemStyleChange(){
+    const val = poemStyleSelect.value;
+    if(val && TYPE_DEFINITIONS[val]){
+      const info = TYPE_DEFINITIONS[val];
+      styleReference.style.display = 'block';
+      styleReference.innerHTML = `
+        <div class="wc-line"><span class="wc-label">Writing a</span>${escapeHtml(val)}
+          <span class="wc-def">${escapeHtml(info.def)}</span>
+          <span class="wc-format"><strong>Format:</strong> ${escapeHtml(info.format)}</span>
+          <span class="wc-example"><strong>Example:</strong> ${escapeHtml(info.example)}</span>
+        </div>
+        ${val === 'Ekphrastic poem' ? `
+          <div class="wc-actions">
+            <button id="styleArtBtn" style="border:1.3px solid var(--teal); background:#fff; color:var(--teal); font-family:var(--font-ui), sans-serif; font-size:11.5px; padding:6px 14px; border-radius:16px; cursor:pointer;">Pull artwork</button>
+          </div>
+          <div id="styleArtworkSlot" style="margin-top:14px;"></div>
+        ` : ''}`;
+      const styleArtBtn = document.getElementById('styleArtBtn');
+      if(styleArtBtn){
+        styleArtBtn.addEventListener('click', async ()=>{
+          styleArtBtn.textContent = 'Loading…'; styleArtBtn.disabled = true;
+          const art = await fetchRandomArtwork();
+          document.getElementById('styleArtworkSlot').innerHTML = artworkHtml(art);
+          styleArtBtn.textContent = 'New artwork'; styleArtBtn.disabled = false;
+        });
+      }
+    } else {
+      styleReference.style.display = 'none';
+      styleReference.innerHTML = '';
+    }
+    if(val === SHAPE_POEM_NAME){
+      shapeToolGroup.style.display = 'flex';
+    } else {
+      shapeToolGroup.style.display = 'none';
+      editor.style.textAlign = '';
+    }
+  }
+  poemStyleSelect.addEventListener('change', onPoemStyleChange);
+  document.getElementById('applyShapeBtn').addEventListener('click', ()=> applyShapeToEditor(shapeSelect.value));
+
+  const wcResult = document.getElementById('wcResult');
+  document.getElementById('wcDrawBtn').addEventListener('click', async ()=>{
+    const useCategory = document.getElementById('wcCategory').checked;
+    const useType = document.getElementById('wcType').checked;
+    const useTopic = document.getElementById('wcTopic').checked;
+    const useChallenge = document.getElementById('wcChallenge').checked;
+
+    wcResult.style.display = 'block';
+    if(!useCategory && !useType && !useTopic && !useChallenge){
+      wcResult.innerHTML = '<div class="wc-empty">Check at least one box to draw a card.</div>';
+      return;
+    }
+
+    let drawnCategory = null;
+    if(useCategory) drawnCategory = Math.random() < 0.5 ? 'poem' : 'story';
+    const effectiveCategory = drawnCategory || (mode === 'story' ? 'story' : 'poem');
+
+    let drawnType = null;
+    if(useType) drawnType = pickRandom(effectiveCategory === 'poem' ? POEM_TYPES : STORY_TYPES);
+
+    let drawnTopic = null;
+    if(useTopic) drawnTopic = pickRandom(TOPIC_BANK);
+
+    let drawnChallenge = null;
+    if(useChallenge) drawnChallenge = `Include the word "${pickRandom(CHALLENGE_WORDS)}" and mention ${pickRandom(CHALLENGE_MENTIONS)}.`;
+
+    const lines = [];
+    if(drawnCategory) lines.push({label:'Category', value: drawnCategory === 'poem' ? 'Poem' : 'Story'});
+    if(drawnType) lines.push({label:'Type / form', value: drawnType, typeInfo: TYPE_DEFINITIONS[drawnType] || null});
+    if(drawnTopic) lines.push({label:'Topic', value: drawnTopic});
+    if(drawnChallenge) lines.push({label:'Challenge', value: drawnChallenge});
+
+    let currentWildCardArtwork = null;
+    wcResult.innerHTML = lines.map(l => `<div class="wc-line"><span class="wc-label">${l.label}</span>${escapeHtml(l.value)}${
+      l.typeInfo ? `
+        <span class="wc-def">${escapeHtml(l.typeInfo.def)}</span>
+        <span class="wc-format"><strong>Format:</strong> ${escapeHtml(l.typeInfo.format)}</span>
+        <span class="wc-example"><strong>Example:</strong> ${escapeHtml(l.typeInfo.example)}</span>
+      ` : ''
+    }</div>`).join('')
+      + `<div class="wc-actions">
+           <button class="pill-btn-light" id="wcSaveBtn" style="border:1.3px solid var(--card-border); background:#fff; color:var(--navy); font-family:var(--font-ui), sans-serif; font-size:11.5px; padding:6px 14px; border-radius:16px; cursor:pointer;">Save as scrap</button>
+           ${drawnCategory ? `<button id="wcSwitchBtn" style="border:1.3px solid var(--card-border); background:#fff; color:var(--navy); font-family:var(--font-ui), sans-serif; font-size:11.5px; padding:6px 14px; border-radius:16px; cursor:pointer;">Switch to ${drawnCategory === 'poem' ? 'Poem' : 'Story'} mode</button>` : ''}
+           ${drawnType === SHAPE_POEM_NAME ? `<button id="wcShapeBtn" style="border:1.3px solid var(--purple); background:#fff; color:var(--purple); font-family:var(--font-ui), sans-serif; font-size:11.5px; padding:6px 14px; border-radius:16px; cursor:pointer;">Shape my textbox</button>` : ''}
+           ${drawnType === 'Ekphrastic poem' ? `<button id="wcArtBtn" style="border:1.3px solid var(--teal); background:#fff; color:var(--teal); font-family:var(--font-ui), sans-serif; font-size:11.5px; padding:6px 14px; border-radius:16px; cursor:pointer;">Pull artwork</button>` : ''}
+         </div>`
+      + (drawnType === 'Ekphrastic poem' ? `<div id="wcArtworkSlot" style="margin-top:14px;"></div>` : '');
+
+    const summary = lines.map(l => `${l.label}: ${l.value}`).join('  ·  ');
+    document.getElementById('wcSaveBtn').addEventListener('click', async ()=>{
+      let finalSummary = summary;
+      if(currentWildCardArtwork){
+        finalSummary += `  ·  Artwork: "${currentWildCardArtwork.title}" — ${currentWildCardArtwork.artist}`;
+      }
+      await addScrap(finalSummary, 'wild card', '#5b3fa6');
+    });
+    const switchBtn = document.getElementById('wcSwitchBtn');
+    if(switchBtn) switchBtn.addEventListener('click', ()=> switchMode(drawnCategory));
+    const shapeBtn = document.getElementById('wcShapeBtn');
+    if(shapeBtn) shapeBtn.addEventListener('click', ()=>{
+      const randomShapeKey = pickRandom(Object.keys(SHAPES));
+      poemStyleSelect.value = SHAPE_POEM_NAME;
+      onPoemStyleChange();
+      shapeSelect.value = randomShapeKey;
+      applyShapeToEditor(randomShapeKey);
+    });
+    const artBtn = document.getElementById('wcArtBtn');
+    if(artBtn) artBtn.addEventListener('click', async ()=>{
+      artBtn.textContent = 'Loading…'; artBtn.disabled = true;
+      const art = await fetchRandomArtwork();
+      currentWildCardArtwork = art;
+      document.getElementById('wcArtworkSlot').innerHTML = artworkHtml(art);
+      artBtn.textContent = 'New artwork'; artBtn.disabled = false;
+    });
+  });
+
+  /* ================= wire it up ================= */
+  editor.addEventListener('input', ()=>{ render(); scheduleAutosave(); if(mode==='poem') schedulePhoneticsRefresh(); });
+
+  applyScale();
+  restoreAutosave().then(()=>{
+    render();
+    if(mode==='poem') schedulePhoneticsRefresh();
+  });
+})();
+</script>
+
+</body>
+</html>
